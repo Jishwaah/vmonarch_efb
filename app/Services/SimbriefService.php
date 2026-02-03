@@ -172,6 +172,79 @@ class SimbriefService
         return $data;
     }
 
+    public function getAerodromeNotams(array $ofp, ?string $icao): array
+    {
+        if (! $icao) {
+            return [];
+        }
+
+        $icao = strtoupper($icao);
+
+        $candidates = [
+            data_get($ofp, 'notams.departure'),
+            data_get($ofp, 'notams.arrival'),
+            data_get($ofp, 'notams.origin'),
+            data_get($ofp, 'notams.destination'),
+            data_get($ofp, "notams.$icao"),
+            data_get($ofp, 'notams'),
+            data_get($ofp, 'notams_raw'),
+            data_get($ofp, 'notam'),
+        ];
+
+        $notams = [];
+
+        foreach ($candidates as $candidate) {
+            if (empty($candidate)) {
+                continue;
+            }
+
+            if (is_string($candidate)) {
+                $parts = preg_split('/\r\n\r\n|\n\n|\r\n|\n/', $candidate);
+                foreach ($parts as $part) {
+                    $text = trim($part);
+                    if ($text === '') {
+                        continue;
+                    }
+                    if (stripos($text, $icao) !== false) {
+                        $notams[] = $text;
+                    }
+                }
+                continue;
+            }
+
+            if (is_array($candidate)) {
+                foreach ($candidate as $item) {
+                    if (is_string($item)) {
+                        $text = trim($item);
+                        if ($text === '') {
+                            continue;
+                        }
+                        if (stripos($text, $icao) !== false) {
+                            $notams[] = $text;
+                        }
+                        continue;
+                    }
+
+                    if (is_array($item)) {
+                        $itemIcao = strtoupper((string) (data_get($item, 'icao') ?? data_get($item, 'airport') ?? data_get($item, 'location')));
+                        if ($itemIcao && $itemIcao !== $icao) {
+                            continue;
+                        }
+                        $text = data_get($item, 'text')
+                            ?? data_get($item, 'raw')
+                            ?? data_get($item, 'message')
+                            ?? null;
+                        if (is_string($text) && trim($text) !== '') {
+                            $notams[] = trim($text);
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_values(array_unique($notams));
+    }
+
     private function needsTextFallback(array $data): bool
     {
         return empty($data['origin_icao']) || empty($data['destination_icao']);

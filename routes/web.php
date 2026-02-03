@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcarsController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\DiscordAuthController;
+use App\Http\Controllers\BriefingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DispatcherController;
 use App\Http\Controllers\OfpController;
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/ofp', [OfpController::class, 'index'])->name('ofp');
         Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
         Route::get('/weather', [WeatherController::class, 'index'])->name('weather');
+        Route::get('/briefing/departure/charts', [BriefingController::class, 'depCharts'])->name('briefing.dep.charts');
+        Route::get('/briefing/departure', [BriefingController::class, 'depBriefing'])->name('briefing.dep.briefing');
+        Route::get('/briefing/arrival/charts', [BriefingController::class, 'arrCharts'])->name('briefing.arr.charts');
+        Route::get('/briefing/arrival', [BriefingController::class, 'arrBriefing'])->name('briefing.arr.briefing');
         Route::get('/acars', [AcarsController::class, 'index'])->name('acars');
         Route::post('/acars/messages', [AcarsController::class, 'send'])->name('acars.send');
     });
