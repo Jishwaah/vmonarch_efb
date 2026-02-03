@@ -86,7 +86,7 @@
             <a class="btn btn-secondary" href="{{ route('performance') }}">Performance</a>
             <a class="btn btn-secondary" href="{{ route('weather') }}">Weather</a>
             <a class="btn btn-secondary" href="{{ route('acars') }}">ACARS</a>
-            <button class="btn btn-secondary" type="button" data-modal-open="crew-modal">Flight Crew</button>
+            <button class="btn btn-secondary" type="button" data-modal-open="crew-modal">Crew Roster</button>
         </div>
     </div>
 
@@ -113,7 +113,7 @@
                                     <span class="muted">({{ $pilotId }})</span>
                                 @endif
                                 @if (data_get($crew, 'fo'))
-                                    <div class="muted">{{ data_get($crew, 'fo') }}, First Officer</div>
+                                    <div>{{ data_get($crew, 'fo') }}  <span class="muted">First Officer</span></div>
                                 @endif
                             </div>
                         </div>
