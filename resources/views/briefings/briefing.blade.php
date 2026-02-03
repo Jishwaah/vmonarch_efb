@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="card">
-        <h2>{{ strtoupper($type) }} Aerodrome NOTAMs</h2>
+        <h2>{{ ucfirst($type) }} Aerodrome NOTAMs</h2>
         <p class="muted">NOTAMs pulled from the latest SimBrief OFP (aerodrome only).</p>
 
         <form class="weather-form" method="GET">
