@@ -61,12 +61,46 @@ a {
     color: #ffd600;
     background: transparent;
     transition: background 0.2s ease;
+    font-weight: 700;
 }
 
 .sidebar-nav a.active,
 .sidebar-nav a:hover {
     background: #ffd600;
     color: #62115d;
+}
+
+.sidebar-link,
+.sidebar-sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+    opacity: 0.9;
+}
+
+.sidebar-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.sidebar-sub .sidebar-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.sidebar-sub .sidebar-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 .sidebar-group {
@@ -85,7 +119,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease;
 }
@@ -98,7 +132,14 @@ a {
 
 .sidebar-chevron {
     transition: transform 0.2s ease;
-    color: #93c5fd;
+    color: #fff1a6;
+    display: inline-flex;
+}
+
+.sidebar-chevron svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
 }
 
 .sidebar-group.open .sidebar-chevron {
@@ -121,6 +162,7 @@ a {
     border-radius: 8px;
     color: #cbd5f5;
     background: transparent;
+    font-weight: 700;
 }
 
 .sidebar-sub.active,
