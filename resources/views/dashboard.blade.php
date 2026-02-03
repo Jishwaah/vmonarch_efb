@@ -113,7 +113,7 @@
                                     <span class="muted">({{ $pilotId }})</span>
                                 @endif
                                 @if (data_get($crew, 'fo'))
-                                    <span class="muted"> · {{ data_get($crew, 'fo') }}, First Officer</span>
+                                    <div class="muted">{{ data_get($crew, 'fo') }}, First Officer</div>
                                 @endif
                             </div>
                         </div>
@@ -146,4 +146,6 @@
         </div>
     </div>
 @endsection
+
+
 
