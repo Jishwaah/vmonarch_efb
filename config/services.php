@@ -40,6 +40,7 @@ return [
         'json_mode' => env('SIMBRIEF_JSON_MODE', 'v2'),
         'performance_url' => env('SIMBRIEF_PERFORMANCE_URL', 'https://www.simbrief.com/system/dispatch.php?section=perf'),
         'api_key' => env('SIMBRIEF_API_KEY'),
+        'cache_minutes' => (int) env('SIMBRIEF_CACHE_MINUTES', 10),
     ],
 
     'discord' => [

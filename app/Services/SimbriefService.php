@@ -8,12 +8,26 @@ use Illuminate\Support\Str;
 
 class SimbriefService
 {
-    public function fetchLatestForUser(User $user): array
+    public function fetchLatestForUser(User $user, bool $forceRefresh = false): array
     {
         if (! $user->simbrief_id) {
             return [
                 'status' => 'missing_id',
                 'message' => 'Add your SimBrief ID to see the latest OFP.',
+            ];
+        }
+
+        $cached = $forceRefresh ? null : $this->getCachedPayload($user);
+        if ($cached) {
+            $ofp = $this->extractOfp($cached);
+            $data = $this->parseOfpData($ofp);
+            $data['ofp_pdf_url'] = $this->extractPdfUrl($ofp) ?? $this->extractPdfUrl($cached);
+
+            return [
+                'status' => 'ok',
+                'data' => $data,
+                'raw' => $ofp,
+                'cached' => true,
             ];
         }
 
@@ -50,6 +64,50 @@ class SimbriefService
             ];
         }
 
+        $this->storeCachedPayload($user, $payload);
+        $ofp = $this->extractOfp($payload);
+
+        $data = $this->parseOfpData($ofp);
+        $data['ofp_pdf_url'] = $this->extractPdfUrl($ofp) ?? $this->extractPdfUrl($payload);
+
+        return [
+            'status' => 'ok',
+            'data' => $data,
+            'raw' => $ofp,
+            'cached' => false,
+        ];
+    }
+
+    private function getCachedPayload(User $user): ?array
+    {
+        $payload = $user->simbrief_payload;
+        if (! is_array($payload) || empty($payload)) {
+            return null;
+        }
+
+        $ttl = (int) config('services.simbrief.cache_minutes', 10);
+        $fetchedAt = $user->simbrief_fetched_at;
+        if (! $fetchedAt) {
+            return null;
+        }
+
+        if ($fetchedAt->diffInMinutes(now()) >= $ttl) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    private function storeCachedPayload(User $user, array $payload): void
+    {
+        $user->forceFill([
+            'simbrief_payload' => $payload,
+            'simbrief_fetched_at' => now(),
+        ])->saveQuietly();
+    }
+
+    private function extractOfp(array $payload): array
+    {
         $ofp = data_get($payload, 'ofp');
         if (! is_array($ofp)) {
             $ofp = data_get($payload, 'data.ofp');
@@ -64,14 +122,7 @@ class SimbriefService
             $ofp = $payload;
         }
 
-        $data = $this->parseOfpData($ofp);
-        $data['ofp_pdf_url'] = $this->extractPdfUrl($ofp) ?? $this->extractPdfUrl($payload);
-
-        return [
-            'status' => 'ok',
-            'data' => $data,
-            'raw' => $ofp,
-        ];
+        return $ofp;
     }
 
     private function parseOfpData(array $ofp): array
@@ -226,12 +277,18 @@ class SimbriefService
                     }
 
                     if (is_array($item)) {
-                        $itemIcao = strtoupper((string) (data_get($item, 'icao') ?? data_get($item, 'airport') ?? data_get($item, 'location')));
+                        $itemIcao = strtoupper((string) (data_get($item, 'icao_id')
+                            ?? data_get($item, 'icao')
+                            ?? data_get($item, 'airport')
+                            ?? data_get($item, 'location')));
                         if ($itemIcao && $itemIcao !== $icao) {
                             continue;
                         }
                         $text = data_get($item, 'text')
                             ?? data_get($item, 'raw')
+                            ?? data_get($item, 'notam_text')
+                            ?? data_get($item, 'notam_report')
+                            ?? data_get($item, 'notam')
                             ?? data_get($item, 'message')
                             ?? null;
                         if (is_string($text) && trim($text) !== '') {

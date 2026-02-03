@@ -36,4 +36,11 @@ class DashboardController extends Controller
             'booking' => $booking,
         ]);
     }
+
+    public function refreshSimbrief(SimbriefService $simbriefService): RedirectResponse
+    {
+        $simbriefService->fetchLatestForUser(auth()->user(), true);
+
+        return redirect()->route('dashboard')->with('status', 'SimBrief data refreshed.');
+    }
 }

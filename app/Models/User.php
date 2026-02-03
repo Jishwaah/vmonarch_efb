@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'simbrief_id',
+        'simbrief_payload',
+        'simbrief_fetched_at',
         'discord_id',
         'discord_username',
         'discord_avatar',
@@ -52,6 +54,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'simbrief_payload' => 'array',
+            'simbrief_fetched_at' => 'datetime',
             'discord_enabled' => 'boolean',
             'discord_dm_enabled' => 'boolean',
             'discord_roles' => 'array',

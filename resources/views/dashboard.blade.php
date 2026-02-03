@@ -6,6 +6,10 @@
 @section('content')
     <div class="card">
         <h2>Current SimBrief Flight</h2>
+        <form method="POST" action="{{ route('dashboard.simbrief.refresh') }}" style="margin-bottom: 12px;">
+            @csrf
+            <button class="btn btn-secondary" type="submit">Force Refresh</button>
+        </form>
 
         @if ($simbrief['status'] !== 'ok')
             <p class="muted">{{ $simbrief['message'] ?? 'No SimBrief flight available yet.' }}</p>
@@ -86,4 +90,5 @@
         </div>
     </div>
 @endsection
+
 

@@ -29,7 +29,7 @@ a {
 
 .sidebar {
     width: 240px;
-    background: #0f172a;
+    background: #62115d;
     color: #e2e8f0;
     padding: 24px;
     display: flex;
@@ -293,7 +293,7 @@ a {
 }
 
 .btn-primary {
-    background: #2563eb;
+    background: #62115d;
     color: #ffffff;
 }
 

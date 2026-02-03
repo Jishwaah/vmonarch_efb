@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('discord.role:pilot')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/simbrief/refresh', [DashboardController::class, 'refreshSimbrief'])->name('dashboard.simbrief.refresh');
         Route::get('/ofp', [OfpController::class, 'index'])->name('ofp');
         Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
         Route::get('/weather', [WeatherController::class, 'index'])->name('weather');
