@@ -18,51 +18,51 @@
                 <div class="flight-block">
                     <div class="label">Origin</div>
                     <div class="value">
-                        {{ $flight['origin_iata'] ?? '—' }}
-                        <span class="icao">{{ $flight['origin_icao'] ?? '—' }}</span>
+                        {{ $flight['origin_iata'] ?? 'ï¿½' }}
+                        <span class="icao">{{ $flight['origin_icao'] ?? 'ï¿½' }}</span>
                     </div>
                 </div>
                 <div class="flight-block">
                     <div class="label">Destination</div>
                     <div class="value">
-                        {{ $flight['destination_iata'] ?? '—' }}
-                        <span class="icao">{{ $flight['destination_icao'] ?? '—' }}</span>
+                        {{ $flight['destination_iata'] ?? 'ï¿½' }}
+                        <span class="icao">{{ $flight['destination_icao'] ?? 'ï¿½' }}</span>
                     </div>
                 </div>
                 <div class="flight-block">
                     <div class="label">Cruise Altitude</div>
-                    <div class="value">{{ $flight['cruise_altitude'] ?? '—' }}</div>
+                    <div class="value">{{ $flight['cruise_altitude'] ?? 'ï¿½' }}</div>
                 </div>                <div class="flight-block">
                     <div class="label">Alternate Airport</div>
                     <div class="value">
                         @if (!empty($flight['alternate_iata']) || !empty($flight['alternate_icao']))
-                            {{ $flight['alternate_iata'] ?? '—' }}
-                            <span class="icao">{{ $flight['alternate_icao'] ?? '—' }}</span>
+                            {{ $flight['alternate_iata'] ?? 'ï¿½' }}
+                            <span class="icao">{{ $flight['alternate_icao'] ?? 'ï¿½' }}</span>
                         @elseif (!empty($flight['alternates']))
                             {{ $flight['alternates'][0] }}
                         @else
-                            —
+                            ï¿½
                         @endif
                     </div>
                     @if (!empty($flight['alternate2_iata']) || !empty($flight['alternate2_icao']))
                         <div class="muted">
                             Secondary:
-                            {{ $flight['alternate2_iata'] ?? '—' }}
-                            <span class="icao">{{ $flight['alternate2_icao'] ?? '—' }}</span>
+                            {{ $flight['alternate2_iata'] ?? 'ï¿½' }}
+                            <span class="icao">{{ $flight['alternate2_icao'] ?? 'ï¿½' }}</span>
                         </div>
                     @endif
                 </div>
                 <div class="flight-block">
                     <div class="label">ETD</div>
-                    <div class="value">{{ $flight['etd'] ?? '—' }}</div>
+                    <div class="value">{{ $flight['etd'] ?? 'ï¿½' }}</div>
                 </div>
                 <div class="flight-block">
                     <div class="label">ETA</div>
-                    <div class="value">{{ $flight['eta'] ?? '—' }}</div>
+                    <div class="value">{{ $flight['eta'] ?? 'ï¿½' }}</div>
                 </div>
                 <div class="flight-block">
                     <div class="label">ETE</div>
-                    <div class="value">{{ $flight['ete'] ?? '—' }}</div>
+                    <div class="value">{{ $flight['ete'] ?? 'ï¿½' }}</div>
                 </div>
             </div>
         @endif
@@ -108,7 +108,7 @@
                         <div class="crew-item">
                             <div class="label">Pilot in Command</div>
                             <div class="value">
-                                {{ data_get($crew, 'cpt') ?? 'Unknown' }}
+                                {{ strtoupper(data_get($crew, 'cpt') ?? 'Unknown') }}
                                 @if ($pilotId)
                                     <span class="muted">({{ $pilotId }})</span>
                                 @endif
@@ -137,7 +137,7 @@
                                         @endforeach
                                     </div>
                                 @else
-                                    —
+                                    ï¿½
                                 @endif
                             </div>
                         </div>
@@ -147,6 +147,5 @@
         </div>
     </div>
 @endsection
-
 
 
