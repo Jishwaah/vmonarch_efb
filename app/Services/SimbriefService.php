@@ -132,6 +132,15 @@ class SimbriefService
                 data_get($ofp, 'initial_altitude'),
                 data_get($ofp, 'plan_altitude'),
             ]),
+            'callsign' => $this->firstNonEmpty([
+                data_get($ofp, 'atc.callsign'),
+                data_get($ofp, 'general.flight_number') && data_get($ofp, 'general.icao_airline')
+                    ? data_get($ofp, 'general.icao_airline').data_get($ofp, 'general.flight_number')
+                    : null,
+            ]),
+            'aircraft_reg' => $this->firstNonEmpty([
+                $this->extractRegFromAtc($ofp),
+            ]),
             'ete' => $this->firstNonEmpty([
                 data_get($ofp, 'times.enroute_time'),
                 data_get($ofp, 'times.est_time_enroute'),
@@ -278,6 +287,26 @@ class SimbriefService
 
             if (is_int($value) || is_float($value)) {
                 return (string) $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function extractRegFromAtc(array $ofp): ?string
+    {
+        $candidates = [
+            data_get($ofp, 'atc.section18'),
+            data_get($ofp, 'atc.flightplan_text'),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (! is_string($candidate) || trim($candidate) === '') {
+                continue;
+            }
+
+            if (preg_match('/REG\\/([A-Z0-9-]+)/i', $candidate, $match)) {
+                return strtoupper($match[1]);
             }
         }
 

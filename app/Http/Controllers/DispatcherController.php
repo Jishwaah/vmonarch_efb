@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DispatcherMessage;
 use App\Services\DiscordBotService;
+use App\Services\SimbriefService;
 use App\Services\VamsysService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ class DispatcherController extends Controller
             $arrivalId = $booking['arrival_id'] ?? null;
             $departureAirport = null;
             $arrivalAirport = null;
+            $aircraftReg = null;
 
             if ($departureId) {
                 try {
@@ -60,10 +62,21 @@ class DispatcherController extends Controller
                 }
             }
 
+            $aircraftId = $booking['aircraft_id'] ?? null;
+            if ($aircraftId) {
+                try {
+                    $aircraft = $vamsysService->getAircraft((int) $aircraftId);
+                    $aircraftReg = $aircraft['registration'] ?? null;
+                } catch (\Throwable $exception) {
+                    $aircraftReg = null;
+                }
+            }
+
             $booking['departure_iata'] = $departureAirport['iata'] ?? null;
             $booking['departure_icao'] = $departureAirport['icao'] ?? null;
             $booking['arrival_iata'] = $arrivalAirport['iata'] ?? null;
             $booking['arrival_icao'] = $arrivalAirport['icao'] ?? null;
+            $booking['aircraft_reg'] = $aircraftReg;
             $booking['pilot'] = $pilot;
             $booking['discord_id'] = $discordId;
             $booking['local_user'] = $localUser;
@@ -111,46 +124,69 @@ class DispatcherController extends Controller
         ]);
     }
 
-    public function sendMessage(Request $request, VamsysService $vamsysService, DiscordBotService $discordBotService): RedirectResponse
+    public function sendMessage(
+        Request $request,
+        VamsysService $vamsysService,
+        DiscordBotService $discordBotService,
+        SimbriefService $simbriefService
+    ): RedirectResponse
     {
         $data = $request->validate([
             'booking_id' => ['required', 'integer'],
             'pilot_id' => ['required', 'integer'],
             'discord_id' => ['required', 'string'],
             'message' => ['required', 'string', 'max:2000'],
+            'callsign' => ['nullable', 'string', 'max:32'],
+            'departure_iata' => ['nullable', 'string', 'max:8'],
+            'arrival_iata' => ['nullable', 'string', 'max:8'],
+            'aircraft_reg' => ['nullable', 'string', 'max:16'],
         ]);
 
         $bookingUrl = $vamsysService->formatBookingUrl((int) $data['booking_id']);
-        $callsign = null;
-        $aircraftReg = null;
-        $departureIata = null;
-        $arrivalIata = null;
+        $callsign = $data['callsign'] ?? null;
+        $aircraftReg = $data['aircraft_reg'] ?? null;
+        $departureIata = $data['departure_iata'] ?? null;
+        $arrivalIata = $data['arrival_iata'] ?? null;
+        $departureIcao = $data['departure_icao'] ?? null;
+        $arrivalIcao = $data['arrival_icao'] ?? null;
+
+        $simbriefUser = \App\Models\User::where('discord_id', $data['discord_id'])->first();
+        if ($simbriefUser && $simbriefUser->simbrief_id) {
+            try {
+                $simbrief = $simbriefService->fetchLatestForUser($simbriefUser);
+                if (($simbrief['status'] ?? null) === 'ok') {
+                    $callsign = $callsign ?: data_get($simbrief, 'data.callsign');
+                    $aircraftReg = $aircraftReg ?: data_get($simbrief, 'data.aircraft_reg');
+                }
+            } catch (\Throwable $exception) {
+                // Ignore SimBrief failures and keep current values.
+            }
+        }
 
         try {
             $bookingsPayload = $vamsysService->getActiveBookings();
             $booking = collect($bookingsPayload['data'] ?? [])
                 ->firstWhere('id', (int) $data['booking_id']);
-            $callsign = $booking['callsign'] ?? null;
+            $callsign = $callsign ?: ($booking['callsign'] ?? null);
             $aircraftId = $booking['aircraft_id'] ?? null;
-            if ($aircraftId) {
+            if (! $aircraftReg && $aircraftId) {
                 $aircraft = $vamsysService->getAircraft((int) $aircraftId);
                 $aircraftReg = $aircraft['registration'] ?? null;
             }
             $departureId = $booking['departure_id'] ?? null;
-            if ($departureId) {
+            if (! $departureIata && $departureId) {
                 $departureAirport = $vamsysService->getAirport((int) $departureId);
                 $departureIata = $departureAirport['iata'] ?? null;
+                $departureIcao = $departureIcao ?: ($departureAirport['icao'] ?? null);
             }
             $arrivalId = $booking['arrival_id'] ?? null;
-            if ($arrivalId) {
+            if (! $arrivalIata && $arrivalId) {
                 $arrivalAirport = $vamsysService->getAirport((int) $arrivalId);
                 $arrivalIata = $arrivalAirport['iata'] ?? null;
+                $arrivalIcao = $arrivalIcao ?: ($arrivalAirport['icao'] ?? null);
             }
         } catch (\Throwable $exception) {
-            $callsign = null;
-            $aircraftReg = null;
-            $departureIata = null;
-            $arrivalIata = null;
+            // Keep whatever we already have from the form.
         }
 
         $now = now('UTC');
@@ -160,8 +196,12 @@ class DispatcherController extends Controller
         $callsignText = $callsign ?: 'CALLSIGN';
         $routeIata = ($departureIata && $arrivalIata)
             ? "{$departureIata}-{$arrivalIata}"
-            : 'DEP-ARR';
-        $formattedMessage = "{$aircraftReg} {$callsignText} {$date} {$time} {$routeIata}\n\n{$data['message']}";
+            : null;
+        $routeIcao = ($departureIcao && $arrivalIcao)
+            ? "{$departureIcao}-{$arrivalIcao}"
+            : null;
+        $routeLabel = $routeIata ?: ($routeIcao ?: 'DEP-ARR');
+        $formattedMessage = "{$aircraftReg} {$callsignText} {$date} {$time} {$routeLabel}\n\n{$data['message']}";
 
         $dispatcherMessage = DispatcherMessage::create([
             'booking_id' => $data['booking_id'],

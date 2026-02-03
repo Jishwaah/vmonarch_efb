@@ -1,4 +1,4 @@
-@extends('layouts.app')
+ï»¿@extends('layouts.app')
 
 @section('title', 'Dispatcher | vMonarch EFB')
 @section('header', 'Dispatcher')
@@ -67,8 +67,9 @@
                             </div>
                             <div class="pilot-block">
                                 <div class="label">Flight</div>
-                                <div class="value">{{ $booking['departure_iata'] ?? data_get($booking, 'departure_id') ?? "�" }} ? {{ $booking['arrival_iata'] ?? data_get($booking, 'arrival_id') ?? "�" }}</div>
+                                <div class="value">{{ $booking['departure_iata'] ?? data_get($booking, 'departure_id') ?? '—' }} → {{ $booking['arrival_iata'] ?? data_get($booking, 'arrival_id') ?? '—' }}</div>
                                 <div class="muted">Network: {{ data_get($booking, 'network') ?? 'Offline' }}</div>
+                                <div class="muted">Aircraft: {{ $booking['aircraft_reg'] ?? 'Unknown' }}</div>
                             </div>
                         </div>
 
@@ -77,6 +78,12 @@
                                 <form method="POST" action="{{ route('dispatcher.message') }}" class="dispatcher-form">
                                     @csrf
                                     <input type="hidden" name="booking_id" value="{{ $booking['id'] }}" />
+                                    <input type="hidden" name="callsign" value="{{ $booking['callsign'] ?? '' }}" />
+                                    <input type="hidden" name="departure_iata" value="{{ $booking['departure_iata'] ?? '' }}" />
+                                    <input type="hidden" name="arrival_iata" value="{{ $booking['arrival_iata'] ?? '' }}" />
+                                    <input type="hidden" name="aircraft_reg" value="{{ $booking['aircraft_reg'] ?? '' }}" />
+                                    <input type="hidden" name="departure_icao" value="{{ $booking['departure_icao'] ?? "" }}" />
+                                    <input type="hidden" name="arrival_icao" value="{{ $booking['arrival_icao'] ?? "" }}" />
                                     <input type="hidden" name="pilot_id" value="{{ $booking['pilot_id'] }}" />
                                     <input type="hidden" name="discord_id" value="{{ $booking['discord_id'] }}" />
                                     <textarea name="message" rows="2" placeholder="Message to pilot..." required></textarea>
@@ -141,4 +148,5 @@
         <p class="muted">Use the history view to see all messages within the last 48 hours.</p>
     </div>
 @endsection
+
 
