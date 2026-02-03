@@ -63,10 +63,11 @@ class DiscordAuthController extends Controller
                 'name' => $discordUser->getName() ?: $discordUser->getNickname() ?: 'Discord Pilot',
                 'email' => $email,
                 'password' => Str::password(32),
+                'discord_dm_enabled' => true,
             ]);
         }
 
-        $user->forceFill([
+        $update = [
             'discord_id' => $discordId,
             'discord_username' => $discordUser->getNickname() ?: $discordUser->getName(),
             'discord_avatar' => $discordUser->getAvatar(),
@@ -74,7 +75,13 @@ class DiscordAuthController extends Controller
             'discord_roles' => $roles,
             'discord_guild_id' => $guildId,
             'discord_roles_synced_at' => now(),
-        ])->save();
+        ];
+
+        if ($user->discord_dm_enabled === null) {
+            $update['discord_dm_enabled'] = true;
+        }
+
+        $user->forceFill($update)->save();
 
         if (! $user->isPilot()) {
             Auth::logout();

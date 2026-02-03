@@ -61,6 +61,7 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'simbrief_id' => $data['simbrief_id'] ?? null,
+            'discord_dm_enabled' => true,
         ]);
 
         Auth::login($user);
