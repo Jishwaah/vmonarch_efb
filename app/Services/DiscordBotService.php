@@ -33,7 +33,7 @@ class DiscordBotService
         $payload = [
             'embeds' => [
                 [
-                    'title' => "Message from {$senderLabel}",
+                    'title' => "{$senderLabel}",
                     'url' => 'https://efb.vmon.uk/acars',
                     'description' => $message,
                     'footer' => [
