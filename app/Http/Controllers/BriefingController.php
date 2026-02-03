@@ -42,24 +42,12 @@ class BriefingController extends Controller
         $icao = preg_match('/^[A-Z]{4}$/', $icao) ? $icao : '';
         $chartUrl = $icao ? "https://chartfox.org/{$icao}" : null;
         $interfaceUrl = $icao ? $chartfoxService->getInterfaceUrl($icao) : null;
-        $charts = [];
-        $chartError = null;
-
-        if ($icao) {
-            try {
-                $charts = $chartfoxService->getAirportCharts($icao);
-            } catch (\Throwable $exception) {
-                $chartError = $exception->getMessage();
-            }
-        }
 
         return view('briefings.charts', [
             'type' => $type,
             'icao' => $icao,
             'chartUrl' => $chartUrl,
             'interfaceUrl' => $interfaceUrl,
-            'charts' => $charts,
-            'chartError' => $chartError,
             'simbrief' => $result,
         ]);
     }

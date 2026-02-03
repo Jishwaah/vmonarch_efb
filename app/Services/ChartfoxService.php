@@ -20,12 +20,12 @@ class ChartfoxService
             ->get("{$baseUrl}/v2/airports/{$icao}/charts");
 
         if (! $response->ok()) {
-            throw new RuntimeException('ChartFox API request failed.');
+            throw new RuntimeException('ChartFox API request failed: '.$response->status().' '.$response->body());
         }
 
         $payload = $response->json();
         if (! is_array($payload)) {
-            throw new RuntimeException('ChartFox API returned an unexpected response.');
+            throw new RuntimeException('ChartFox API returned an unexpected response: '.$response->status().' '.$response->body());
         }
 
         return $payload['data'] ?? [];
