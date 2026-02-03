@@ -34,7 +34,11 @@ class DiscordBotService
             'embeds' => [
                 [
                     'title' => "Message from {$senderLabel}",
+                    'url' => 'https://efb.vmon.uk/acars',
                     'description' => $message,
+                    'footer' => [
+                        'text' => 'vMonarch Dispatcher · Sent at '.now('UTC')->format('H:i:s').' UTC',
+                    ],
                     'color' => 0x3B82F6,
                 ],
             ],

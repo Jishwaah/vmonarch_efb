@@ -12,9 +12,18 @@
         @else
             <p class="muted">Open the SimBrief PDF for your latest flight plan.</p>
             @if (!empty($flight['ofp_pdf_url']))
-                <a class="btn btn-primary" href="{{ $flight['ofp_pdf_url'] }}" target="_blank" rel="noopener noreferrer">
-                    Open OFP PDF
-                </a>
+                <div class="ofp-actions">
+                    <a class="btn btn-primary" href="{{ $flight['ofp_pdf_url'] }}" target="_blank" rel="noopener noreferrer">
+                        Open OFP PDF
+                    </a>
+                </div>
+                <div class="ofp-embed">
+                    <iframe
+                        title="SimBrief OFP PDF"
+                        src="{{ $flight['ofp_pdf_url'] }}"
+                        loading="lazy"
+                    ></iframe>
+                </div>
             @else
                 <p class="muted">No PDF link available from SimBrief yet.</p>
             @endif

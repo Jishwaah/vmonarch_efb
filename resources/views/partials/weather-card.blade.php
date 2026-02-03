@@ -5,7 +5,7 @@
     $windDir = $data['wind_dir'] ?? null;
     $windSpeed = $data['wind_speed'] ?? null;
     $windGust = $data['wind_gust'] ?? null;
-    $visibility = $data['visibility_sm'] ?? null;
+    $visibility = $data['visibility'] ?? null;
     $qnh = $data['qnh_hpa'] ?? null;
     $temp = $data['temperature_c'] ?? null;
     $dew = $data['dewpoint_c'] ?? null;
@@ -79,7 +79,15 @@
             </div>
             <div class="metric">
                 <div class="label">Visibility</div>
-                <div class="value">{{ $visibility !== null ? $visibility.' SM' : '—' }}</div>
+                <div class="value">
+                    @if (is_array($visibility))
+                        {{ $visibility['value'] }} {{ $visibility['unit'] }}
+                    @elseif ($visibility !== null)
+                        {{ $visibility }}
+                    @else
+                        —
+                    @endif
+                </div>
             </div>
             <div class="metric">
                 <div class="label">QNH</div>

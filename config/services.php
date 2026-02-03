@@ -39,6 +39,7 @@ return [
         'base_url' => env('SIMBRIEF_BASE_URL', 'https://www.simbrief.com/api/xml.fetcher.php'),
         'json_mode' => env('SIMBRIEF_JSON_MODE', 'v2'),
         'performance_url' => env('SIMBRIEF_PERFORMANCE_URL', 'https://www.simbrief.com/system/dispatch.php?section=perf'),
+        'api_key' => env('SIMBRIEF_API_KEY'),
     ],
 
     'discord' => [
@@ -62,7 +63,7 @@ return [
         'redirect' => env('VAMSYS_REDIRECT_URI'),
         'base_url' => env('VAMSYS_BASE_URL', 'https://vamsys.io/api/v3/operations'),
         'token_url' => env('VAMSYS_TOKEN_URL', 'https://vamsys.io/oauth/token'),
-        'web_booking_url' => env('VAMSYS_WEB_BOOKING_URL', 'https://vamsys.io/operations/bookings/{id}'),
+        'web_booking_url' => env('VAMSYS_WEB_BOOKING_URL', 'https://vamsys.io/phoenix/flight-center/booking/{id}'),
     ],
 
     'weather' => [

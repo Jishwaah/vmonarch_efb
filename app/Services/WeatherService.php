@@ -57,16 +57,19 @@ class WeatherService
         }
 
         $clouds = is_array(data_get($metar, 'clouds')) ? data_get($metar, 'clouds') : [];
+        $rawMetar = data_get($metar, 'rawOb');
+        $visibility = data_get($metar, 'visib');
+        $visibilityDisplay = $this->formatVisibility($rawMetar, $visibility);
 
         return [
             'status' => 'ok',
             'icao' => $icao,
             'name' => data_get($metar, 'name'),
-            'raw_metar' => data_get($metar, 'rawOb'),
+            'raw_metar' => $rawMetar,
             'raw_taf' => data_get($taf, 'rawTAF'),
             'temperature_c' => data_get($metar, 'temp'),
             'dewpoint_c' => data_get($metar, 'dewp'),
-            'visibility_sm' => data_get($metar, 'visib'),
+            'visibility' => $visibilityDisplay,
             'wind_dir' => data_get($metar, 'wdir'),
             'wind_speed' => data_get($metar, 'wspd'),
             'wind_gust' => data_get($metar, 'wgst'),
@@ -106,5 +109,60 @@ class WeatherService
         }
 
         return 'clear';
+    }
+
+    private function formatVisibility(?string $rawMetar, $visibility): ?array
+    {
+        if ($visibility === null) {
+            return null;
+        }
+
+        $raw = strtoupper((string) $rawMetar);
+        $isStatute = str_contains($raw, 'SM');
+
+        if ($isStatute) {
+            return [
+                'value' => $visibility,
+                'unit' => 'SM',
+            ];
+        }
+
+        // METAR 9999 means 10km or more.
+        if (preg_match('/\b9999\b/', $raw)) {
+            return [
+                'value' => '10+',
+                'unit' => 'km',
+            ];
+        }
+
+        if (is_numeric($visibility)) {
+            $meters = round(((float) $visibility) * 1609.34);
+
+            return $this->formatMeters($meters);
+        }
+
+        if (is_string($visibility) && is_numeric($visibility)) {
+            return $this->formatMeters((int) $visibility);
+        }
+
+        return [
+            'value' => (string) $visibility,
+            'unit' => 'm',
+        ];
+    }
+
+    private function formatMeters(int $meters): array
+    {
+        if ($meters >= 1000) {
+            return [
+                'value' => number_format($meters / 1000, 1),
+                'unit' => 'km',
+            ];
+        }
+
+        return [
+            'value' => (string) $meters,
+            'unit' => 'm',
+        ];
     }
 }

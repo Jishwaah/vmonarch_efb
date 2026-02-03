@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/performance', [PerformanceController::class, 'index'])->name('performance');
         Route::get('/weather', [WeatherController::class, 'index'])->name('weather');
         Route::get('/acars', [AcarsController::class, 'index'])->name('acars');
+        Route::post('/acars/messages', [AcarsController::class, 'send'])->name('acars.send');
     });
 
     Route::middleware('discord.role:staff')->group(function () {

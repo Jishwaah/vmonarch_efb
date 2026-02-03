@@ -207,10 +207,17 @@ class SimbriefService
 
     private function extractPdfUrl(array $payload): ?string
     {
+        $directory = data_get($payload, 'files.directory');
+        $pdfLink = data_get($payload, 'files.pdf.link');
+        if (is_string($directory) && is_string($pdfLink) && $directory !== '' && $pdfLink !== '') {
+            return rtrim($directory, '/').'/'.ltrim($pdfLink, '/');
+        }
+
         $candidates = [
             data_get($payload, 'links.pdf'),
             data_get($payload, 'links.ofp_pdf'),
             data_get($payload, 'links.pdf_url'),
+            data_get($payload, 'files.pdf.link'),
             data_get($payload, 'files.pdf'),
             data_get($payload, 'ofp.pdf'),
             data_get($payload, 'ofp.link'),

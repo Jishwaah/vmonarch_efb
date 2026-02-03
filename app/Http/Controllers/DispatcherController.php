@@ -96,12 +96,29 @@ class DispatcherController extends Controller
         ]);
 
         $bookingUrl = $vamsysService->formatBookingUrl((int) $data['booking_id']);
+        $callsign = null;
+
+        try {
+            $bookingsPayload = $vamsysService->getActiveBookings();
+            $booking = collect($bookingsPayload['data'] ?? [])
+                ->firstWhere('id', (int) $data['booking_id']);
+            $callsign = $booking['callsign'] ?? null;
+        } catch (\Throwable $exception) {
+            $callsign = null;
+        }
+
+        $now = now('UTC');
+        $date = strtoupper($now->format('dMy'));
+        $time = $now->format('Hi').'Z';
+        $aircraftReg = 'G-ZBXX';
+        $callsignText = $callsign ?: 'CALLSIGN';
+        $formattedMessage = "{$aircraftReg} {$callsignText} {$date} {$time}\n\n{$data['message']}";
 
         $dispatcherMessage = DispatcherMessage::create([
             'booking_id' => $data['booking_id'],
             'pilot_id' => $data['pilot_id'],
             'discord_user_id' => $data['discord_id'],
-            'message' => $data['message'],
+            'message' => $formattedMessage,
             'sent_by' => $request->user()->id,
             'status' => 'pending',
             'booking_url' => $bookingUrl,
@@ -110,7 +127,7 @@ class DispatcherController extends Controller
         ]);
 
         try {
-            $discordBotService->sendDirectMessage($data['discord_id'], $data['message']);
+            $discordBotService->sendDirectMessage($data['discord_id'], $formattedMessage);
             $dispatcherMessage->status = 'sent';
             $dispatcherMessage->sent_at = now();
         } catch (\Throwable $exception) {
