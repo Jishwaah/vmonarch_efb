@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', ($type) . ' Charts | vMonarch EFB')
-@section('header', ($type) . ' Charts')
+@section('title', ucfirst($type) . ' Charts | vMonarch EFB')
+@section('header', ucfirst($type) . ' Charts')
 
 @section('content')
     <div class="card">
