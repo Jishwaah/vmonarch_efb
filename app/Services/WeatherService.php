@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\WeatherCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class WeatherService
 {
@@ -16,6 +18,18 @@ class WeatherService
                 'message' => 'Invalid ICAO identifier.',
                 'icao' => $icao,
             ];
+        }
+
+        $cached = WeatherCache::query()
+            ->where('icao', $icao)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if ($cached && is_array($cached->payload)) {
+            $payload = $cached->payload;
+            $payload['cached'] = true;
+
+            return $payload;
         }
 
         $baseUrl = rtrim((string) config('services.weather.base_url'), '/');
@@ -61,7 +75,7 @@ class WeatherService
         $visibility = data_get($metar, 'visib');
         $visibilityDisplay = $this->formatVisibility($rawMetar, $visibility);
 
-        return [
+        $response = [
             'status' => 'ok',
             'icao' => $icao,
             'name' => data_get($metar, 'name'),
@@ -78,7 +92,20 @@ class WeatherService
             'clouds' => $clouds,
             'flight_category' => data_get($metar, 'fltCat'),
             'icon' => $this->resolveIcon(data_get($metar, 'wxString'), $clouds),
+            'cached' => false,
         ];
+
+        $cacheMinutes = (int) config('services.weather.cache_minutes', 20);
+        WeatherCache::updateOrCreate(
+            ['icao' => $icao],
+            [
+                'payload' => $response,
+                'fetched_at' => now(),
+                'expires_at' => now()->addMinutes($cacheMinutes),
+            ]
+        );
+
+        return $response;
     }
 
     private function resolveIcon(?string $wxString, array $clouds): string

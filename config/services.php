@@ -70,6 +70,7 @@ return [
 
     'weather' => [
         'base_url' => env('AVIATION_WEATHER_BASE_URL', 'https://aviationweather.gov/api/data'),
+        'cache_minutes' => (int) env('WEATHER_CACHE_MINUTES', 20),
     ],
 
     'autorouter' => [
