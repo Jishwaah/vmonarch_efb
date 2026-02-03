@@ -10,7 +10,7 @@
         <a href="{{ route('weather') }}" class="{{ request()->routeIs('weather') ? 'active' : '' }}">Weather</a>
         <div class="sidebar-group {{ request()->routeIs('briefing.dep.*') ? 'open' : '' }}" data-sidebar-group>
             <button class="sidebar-group-toggle" type="button" data-sidebar-toggle>
-                <span>DEP BRIEF</span>
+                <span>Departure</span>
                 <span class="sidebar-chevron">▸</span>
             </button>
             <div class="sidebar-subnav" data-sidebar-subnav>
@@ -20,7 +20,7 @@
         </div>
         <div class="sidebar-group {{ request()->routeIs('briefing.arr.*') ? 'open' : '' }}" data-sidebar-group>
             <button class="sidebar-group-toggle" type="button" data-sidebar-toggle>
-                <span>ARR BRIEF</span>
+                <span>Arrival</span>
                 <span class="sidebar-chevron">▸</span>
             </button>
             <div class="sidebar-subnav" data-sidebar-subnav>
