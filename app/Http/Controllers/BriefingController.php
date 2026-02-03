@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ChartfoxService;
 use App\Services\SimbriefService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BriefingController extends Controller
 {
-    public function depCharts(Request $request, SimbriefService $simbriefService): View
+    public function depCharts(Request $request, SimbriefService $simbriefService, ChartfoxService $chartfoxService): View
     {
-        return $this->charts($request, $simbriefService, 'departure');
+        return $this->charts($request, $simbriefService, $chartfoxService, 'departure');
     }
 
-    public function arrCharts(Request $request, SimbriefService $simbriefService): View
+    public function arrCharts(Request $request, SimbriefService $simbriefService, ChartfoxService $chartfoxService): View
     {
-        return $this->charts($request, $simbriefService, 'arrival');
+        return $this->charts($request, $simbriefService, $chartfoxService, 'arrival');
     }
 
     public function depBriefing(Request $request, SimbriefService $simbriefService): View
@@ -28,7 +29,7 @@ class BriefingController extends Controller
         return $this->briefing($request, $simbriefService, 'arrival');
     }
 
-    private function charts(Request $request, SimbriefService $simbriefService, string $type): View
+    private function charts(Request $request, SimbriefService $simbriefService, ChartfoxService $chartfoxService, string $type): View
     {
         $result = $simbriefService->fetchLatestForUser(auth()->user());
         $flight = $result['data'] ?? [];
@@ -40,11 +41,25 @@ class BriefingController extends Controller
 
         $icao = preg_match('/^[A-Z]{4}$/', $icao) ? $icao : '';
         $chartUrl = $icao ? "https://chartfox.org/{$icao}" : null;
+        $interfaceUrl = $icao ? $chartfoxService->getInterfaceUrl($icao) : null;
+        $charts = [];
+        $chartError = null;
+
+        if ($icao) {
+            try {
+                $charts = $chartfoxService->getAirportCharts($icao);
+            } catch (\Throwable $exception) {
+                $chartError = $exception->getMessage();
+            }
+        }
 
         return view('briefings.charts', [
             'type' => $type,
             'icao' => $icao,
             'chartUrl' => $chartUrl,
+            'interfaceUrl' => $interfaceUrl,
+            'charts' => $charts,
+            'chartError' => $chartError,
             'simbrief' => $result,
         ]);
     }
@@ -61,10 +76,9 @@ class BriefingController extends Controller
         ));
 
         $icao = preg_match('/^[A-Z]{4}$/', $icao) ? $icao : '';
-        $notams = $icao ? $this->fetchAutorouterNotams($icao) : [];
-        if (empty($notams) && $icao && is_array($raw)) {
-            $notams = $simbriefService->getAerodromeNotams($raw, $icao);
-        }
+        $notams = $icao && is_array($raw)
+            ? $simbriefService->getAerodromeNotams($raw, $icao)
+            : [];
 
         return view('briefings.briefing', [
             'type' => $type,
@@ -74,80 +88,5 @@ class BriefingController extends Controller
         ]);
     }
 
-    private function fetchAutorouterNotams(string $icao): array
-    {
-        $baseUrl = rtrim((string) config('services.autorouter.base_url', 'https://api.autorouter.aero/v1.0'), '/');
-
-        $response = \Illuminate\Support\Facades\Http::timeout(10)
-            ->acceptJson()
-            ->get($baseUrl.'/notam', [
-                'itemas' => json_encode([$icao]),
-                'offset' => 0,
-                'limit' => 10,
-            ]);
-
-        if (! $response->ok()) {
-            return [];
-        }
-
-        $payload = $response->json();
-        if (! is_array($payload)) {
-            return [];
-        }
-
-        return $this->extractAutorouterNotams($payload);
-    }
-
-    private function extractAutorouterNotams(array $payload): array
-    {
-        $candidates = [];
-
-        foreach (['notams', 'data', 'items', 'results'] as $key) {
-            if (isset($payload[$key])) {
-                $candidates[] = $payload[$key];
-            }
-        }
-
-        $candidates[] = $payload;
-
-        $notams = [];
-
-        foreach ($candidates as $candidate) {
-            if (is_string($candidate)) {
-                $parts = preg_split('/\r\n\r\n|\n\n|\r\n|\n/', $candidate);
-                foreach ($parts as $part) {
-                    $text = trim($part);
-                    if ($text !== '') {
-                        $notams[] = $text;
-                    }
-                }
-                continue;
-            }
-
-            if (is_array($candidate)) {
-                foreach ($candidate as $item) {
-                    if (is_string($item)) {
-                        $text = trim($item);
-                        if ($text !== '') {
-                            $notams[] = $text;
-                        }
-                        continue;
-                    }
-
-                    if (is_array($item)) {
-                        $text = $item['text']
-                            ?? $item['raw']
-                            ?? $item['message']
-                            ?? $item['notam']
-                            ?? null;
-                        if (is_string($text) && trim($text) !== '') {
-                            $notams[] = trim($text);
-                        }
-                    }
-                }
-            }
-        }
-
-        return array_values(array_unique($notams));
-    }
+    // Autorouter NOTAM fetching removed; SimBrief JSON is now the sole source.
 }

@@ -74,4 +74,9 @@ return [
         'base_url' => env('AUTOROUTER_NOTAM_BASE_URL', 'https://api.autorouter.aero/v1.0'),
     ],
 
+    'chartfox' => [
+        'base_url' => env('CHARTFOX_BASE_URL', 'https://api.chartfox.org'),
+        'token' => env('CHARTFOX_API_TOKEN'),
+    ],
+
 ];

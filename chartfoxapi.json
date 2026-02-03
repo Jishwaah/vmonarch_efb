@@ -1,0 +1,2058 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ChartFox API Documentation",
+    "description": "API documentation for the ChartFox API.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.chartfox.org"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Airports",
+      "description": "\nEndpoints for searching and viewing airports"
+    },
+    {
+      "name": "Charts",
+      "description": "\nEndpoints for getting details and files for charts"
+    },
+    {
+      "name": "Interfaces",
+      "description": "\nEndpoints for getting embeddable interfaces that can be used in your own site in an iframe"
+    },
+    {
+      "name": "OAuth User Data",
+      "description": "\nEndpoints for access data associated with the OAuth User"
+    },
+    {
+      "name": "Error Reports",
+      "description": "\nEndpoints for error reports"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "AirportType": {
+        "type": "string",
+        "enum": [
+          "closed",
+          "small_airport",
+          "medium_airport",
+          "large_airport",
+          "seaplane_base",
+          "heliport",
+          "balloonport"
+        ],
+        "x-enum-varnames": [
+          "Closed",
+          "SmallAirport",
+          "MediumAirport",
+          "LargeAirport",
+          "SeaplaneBase",
+          "Heliport",
+          "BaloonPort"
+        ],
+        "description": "> \n* `Closed` - closed\n* `SmallAirport` - small_airport\n* `MediumAirport` - medium_airport\n* `LargeAirport` - large_airport\n* `SeaplaneBase` - seaplane_base\n* `Heliport` - heliport\n* `BaloonPort` - balloonport"
+      },
+      "ChartType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          99
+        ],
+        "x-enum-varnames": [
+          "Unknown",
+          "General",
+          "Textual",
+          "GroundLayout",
+          "SID",
+          "STAR",
+          "Approach",
+          "Transition",
+          "Briefing"
+        ],
+        "description": "> \n* `Unknown` - 0\n* `General` - 1\n* `Textual` - 2\n* `GroundLayout` - 3\n* `SID` - 4\n* `STAR` - 5\n* `Approach` - 6\n* `Transition` - 7\n* `Briefing` - 99"
+      },
+      "ChartUrlType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "x-enum-varnames": [
+          "PDF",
+          "IMG",
+          "HTML"
+        ],
+        "description": "> \n* `PDF` - 0\n* `IMG` - 1\n* `HTML` - 2"
+      },
+      "ChartMetaType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "x-enum-varnames": [
+          "Runways",
+          "ProcedureIdent",
+          "ProcedureType"
+        ],
+        "description": "> \n* `Runways` - 0\n* `ProcedureIdent` - 1\n* `ProcedureType` - 2"
+      },
+      "FileType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1
+        ],
+        "x-enum-varnames": [
+          "PDF",
+          "IMG"
+        ],
+        "description": "> \n* `PDF` - 0\n* `IMG` - 1"
+      },
+      "AirportData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "ident": {
+            "type": "string",
+            "example": "ECOW",
+            "description": "Primary identifier for the airport. Typically ICAO code",
+            "enum": []
+          },
+          "icao_code": {
+            "type": "string",
+            "example": "ECOW"
+          },
+          "iata_code": {
+            "type": "string",
+            "example": null
+          },
+          "name": {
+            "type": "string",
+            "example": "O'Kon Alley"
+          },
+          "type": {
+            "type": "string",
+            "example": "medium_airport",
+            "description": "[NULLABLE] Enum describing the type of airport. Allowed Values: closed (Closed), small_airport (SmallAirport), medium_airport (MediumAirport), large_airport (LargeAirport), seaplane_base (SeaplaneBase), heliport (Heliport), balloonport (BaloonPort)",
+            "enum": [],
+            "$ref": "#/components/schemas/AirportType"
+          },
+          "latitude": {
+            "type": "number",
+            "example": 46.965547
+          },
+          "longitude": {
+            "type": "number",
+            "example": 50.015088
+          },
+          "elevation_ft": {
+            "type": "integer",
+            "example": 528,
+            "description": "[NULLABLE] Airfield elevation in feet",
+            "enum": []
+          },
+          "iso_a2_country": {
+            "type": "string",
+            "example": "GB",
+            "description": "[NULLABLE] The ISO 2 Alpha country code that the airport resides in",
+            "enum": []
+          },
+          "has_charts": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether the airport has charts available",
+            "enum": []
+          },
+          "has_sources": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether the airport has sources available",
+            "enum": []
+          }
+        }
+      },
+      "ChartOverviewData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "dc505ffe-58a8-35d1-b100-fa0da3fc2c5c"
+          },
+          "parent_id": {
+            "type": "string",
+            "example": null,
+            "description": "[NULLABLE] ID of the parent chart",
+            "enum": []
+          },
+          "airport_icao": {
+            "type": "string",
+            "example": "RTYC",
+            "description": "ICAO code of the airport the chart belongs to",
+            "enum": []
+          },
+          "name": {
+            "type": "string",
+            "example": "Ground Parking Chart",
+            "description": "Long-form chart name",
+            "enum": []
+          },
+          "code": {
+            "type": "string",
+            "example": "1-2",
+            "description": "[NULLABLE] Short-form chart identifier",
+            "enum": []
+          },
+          "type": {
+            "type": "integer",
+            "example": 3,
+            "description": "Enum describing the chart's type. Allowed Values: 0 (Unknown), 1 (General), 2 (Textual), 3 (GroundLayout), 4 (SID), 5 (STAR), 6 (Approach), 7 (Transition), 99 (Briefing)",
+            "enum": [],
+            "$ref": "#/components/schemas/ChartType"
+          },
+          "type_key": {
+            "type": "string",
+            "example": "GroundLayout",
+            "description": "Chart Type Key Name",
+            "enum": []
+          },
+          "meta": {
+            "type": "array",
+            "example": [
+              {
+                "type": 0,
+                "type_key": "Runways",
+                "value": [
+                  "26L",
+                  "08R"
+                ]
+              }
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "integer",
+                  "example": 0
+                },
+                "type_key": {
+                  "type": "string",
+                  "example": "Runways"
+                },
+                "value": {
+                  "type": "array",
+                  "example": [
+                    "26L",
+                    "08R"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "view_url": {
+            "type": "string",
+            "example": "https://chartfox.org/RTYC#dc505ffe-58a8-35d1-b100-fa0da3fc2c5c"
+          },
+          "has_georeferences": {
+            "type": "boolean",
+            "example": false,
+            "description": "[NULLABLE] Whether the chart has geo references",
+            "enum": []
+          }
+        }
+      },
+      "ChartData": {
+        "type": "object",
+        "example": {
+          "id": "00d5de24-a0fb-33d9-920a-3c2895a40a17",
+          "parent_id": null,
+          "airport_icao": "YFNV",
+          "name": "SID BOGNA1X",
+          "code": "4-3",
+          "type": 4,
+          "type_key": "SID",
+          "url": "https://chartfox.org/storage/charts/file/path",
+          "view_url": "https://chartfox.org/YFNV#00d5de24-a0fb-33d9-920a-3c2895a40a17",
+          "source_url": "http://example.org/path/to/chart.pdf",
+          "source_url_type": 0,
+          "source_uuid": null,
+          "meta": [
+            {
+              "type": 0,
+              "type_key": "Runways",
+              "value": [
+                "26L",
+                "08R"
+              ]
+            }
+          ],
+          "source": {
+            "id": 2,
+            "name": "ExSource",
+            "url": "http://kuhic.info/ipsam-totam-corrupti-unde-nulla",
+            "display_name": "Example Source Ltd",
+            "iso_a2_countries": [
+              "AE"
+            ],
+            "copyright_statement_short": "Voluptatibus et consectetur.",
+            "copyright_statement_long": null,
+            "copyright_status_description": "Non commercial no reproduction",
+            "last_full_update": null
+          },
+          "files": [
+            {
+              "type": 1,
+              "url": "https://chartfox.org/storage/charts/file/path"
+            }
+          ],
+          "georefs": [
+            {
+              "tx": 1549.01,
+              "ty": 1142.7,
+              "k": 6.76,
+              "transform_angle": 261.1,
+              "pdf_page_rotation": 270,
+              "page": 1
+            }
+          ],
+          "requires_preauth": false,
+          "allows_iframe": true,
+          "has_georeferences": true
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "00d5de24-a0fb-33d9-920a-3c2895a40a17"
+          },
+          "parent_id": {
+            "type": "string",
+            "example": null,
+            "description": "[NULLABLE] ID of the parent chart",
+            "enum": []
+          },
+          "airport_icao": {
+            "type": "string",
+            "example": "YFNV",
+            "description": "ICAO code of the airport the chart belongs to",
+            "enum": []
+          },
+          "name": {
+            "type": "string",
+            "example": "SID BOGNA1X",
+            "description": "Long-form chart name",
+            "enum": []
+          },
+          "code": {
+            "type": "string",
+            "example": "4-3",
+            "description": "[NULLABLE] Short-form chart identifier",
+            "enum": []
+          },
+          "type": {
+            "type": "integer",
+            "example": 4,
+            "description": "Enum describing the chart's type. Allowed Values: 0 (Unknown), 1 (General), 2 (Textual), 3 (GroundLayout), 4 (SID), 5 (STAR), 6 (Approach), 7 (Transition), 99 (Briefing)",
+            "enum": [],
+            "$ref": "#/components/schemas/ChartType"
+          },
+          "type_key": {
+            "type": "string",
+            "example": "SID",
+            "description": "Chart Type Key Name",
+            "enum": []
+          },
+          "url": {
+            "type": "string",
+            "example": "https://chartfox.org/storage/charts/file/path",
+            "description": "URL of the chart",
+            "enum": []
+          },
+          "view_url": {
+            "type": "string",
+            "example": "https://chartfox.org/YFNV#00d5de24-a0fb-33d9-920a-3c2895a40a17",
+            "description": "[NULLABLE] URL to view the chart in ChartFox",
+            "enum": []
+          },
+          "source_url": {
+            "type": "string",
+            "example": "http://example.org/path/to/chart.pdf",
+            "description": "[NULLABLE] URL of the chart at the supplier (if available)",
+            "enum": []
+          },
+          "source_url_type": {
+            "type": "integer",
+            "example": 0,
+            "description": "[NULLABLE] Enum describing the type of the source url. Allowed Values: 0 (PDF), 1 (IMG), 2 (HTML)",
+            "enum": [],
+            "$ref": "#/components/schemas/ChartUrlType"
+          },
+          "source_uuid": {
+            "type": "string",
+            "example": null,
+            "description": "[NULLABLE] Identifier that uniquely describes this chart at the supplier",
+            "enum": []
+          },
+          "meta": {
+            "type": "array",
+            "example": [
+              {
+                "type": 0,
+                "type_key": "Runways",
+                "value": [
+                  "26L",
+                  "08R"
+                ]
+              }
+            ],
+            "description": "[NULLABLE] Meta data about this chart",
+            "enum": [],
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "integer",
+                  "example": 0,
+                  "description": "Enum describing the type of meta. Allowed Values: 0 (Runways), 1 (ProcedureIdent), 2 (ProcedureType)",
+                  "enum": [],
+                  "$ref": "#/components/schemas/ChartMetaType"
+                },
+                "type_key": {
+                  "type": "string",
+                  "example": "Runways",
+                  "description": "String representation of the enum type",
+                  "enum": []
+                },
+                "value": {
+                  "type": "array",
+                  "example": [
+                    "26L",
+                    "08R"
+                  ],
+                  "description": "The value of the meta data",
+                  "enum": [],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 2
+              },
+              "name": {
+                "type": "string",
+                "example": "ExSource"
+              },
+              "url": {
+                "type": "string",
+                "example": "http://kuhic.info/ipsam-totam-corrupti-unde-nulla"
+              },
+              "display_name": {
+                "type": "string",
+                "example": "Example Source Ltd"
+              },
+              "iso_a2_countries": {
+                "type": "array",
+                "example": [
+                  "AE"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "copyright_statement_short": {
+                "type": "string",
+                "example": "Voluptatibus et consectetur."
+              },
+              "copyright_statement_long": {
+                "type": "string",
+                "example": null
+              },
+              "copyright_status_description": {
+                "type": "string",
+                "example": "Non commercial no reproduction"
+              },
+              "last_full_update": {
+                "type": "string",
+                "example": null
+              }
+            }
+          },
+          "files": {
+            "type": "array",
+            "example": [
+              {
+                "type": 1,
+                "url": "https://chartfox.org/storage/charts/file/path"
+              }
+            ],
+            "description": "[NULLABLE] ",
+            "enum": [],
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "integer",
+                  "example": 1,
+                  "description": "\\App\\Enums\\FileType Enum describing the file type",
+                  "enum": [],
+                  "$ref": "#/components/schemas/FileType"
+                },
+                "url": {
+                  "type": "string",
+                  "example": "https://chartfox.org/storage/charts/file/path"
+                }
+              }
+            }
+          },
+          "georefs": {
+            "type": "array",
+            "example": [
+              {
+                "tx": 1549.01,
+                "ty": 1142.7,
+                "k": 6.76,
+                "transform_angle": 261.1,
+                "pdf_page_rotation": 270,
+                "page": 1
+              }
+            ],
+            "description": "[NULLABLE] ",
+            "enum": [],
+            "items": {
+              "type": "object",
+              "properties": {
+                "tx": {
+                  "type": "number",
+                  "example": 1549.01
+                },
+                "ty": {
+                  "type": "number",
+                  "example": 1142.7
+                },
+                "k": {
+                  "type": "number",
+                  "example": 6.76
+                },
+                "transform_angle": {
+                  "type": "number",
+                  "example": 261.1
+                },
+                "pdf_page_rotation": {
+                  "type": "integer",
+                  "example": 270
+                },
+                "page": {
+                  "type": "integer",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "requires_preauth": {
+            "type": "boolean",
+            "example": false,
+            "description": "[NULLABLE] Whether the chart requires special pre-authorisation before the URL can be viewed (e.g. disclaimer acceptance)",
+            "enum": []
+          },
+          "allows_iframe": {
+            "type": "boolean",
+            "example": true,
+            "description": "[NULLABLE] Whether the chart allows for iframing",
+            "enum": []
+          },
+          "has_georeferences": {
+            "type": "boolean",
+            "example": true,
+            "description": "[NULLABLE] Whether the chart has geo references",
+            "enum": []
+          }
+        }
+      },
+      "UserDataExternal": {
+        "type": "object",
+        "example": {
+          "id": 1,
+          "first_name": "Arnulfo",
+          "last_name": "Kilback",
+          "full_name": "Arnulfo Kilback",
+          "feature_grant_ids": [
+            "native_app"
+          ]
+        },
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "first_name": {
+            "type": "string",
+            "example": "Arnulfo"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Kilback"
+          },
+          "full_name": {
+            "type": "string",
+            "example": "Arnulfo Kilback"
+          },
+          "feature_grant_ids": {
+            "type": "array",
+            "example": [
+              "native_app"
+            ],
+            "description": "[NULLABLE] ",
+            "enum": [],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TelemetryData": {
+        "type": "object",
+        "example": {
+          "latitude": -67.208176,
+          "longitude": -54.805696,
+          "heading": 159,
+          "source": "Chart fox uplink",
+          "next_update": "2023-08-08T10:00:01+00:00"
+        },
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "example": -67.208176
+          },
+          "longitude": {
+            "type": "number",
+            "example": -54.805696
+          },
+          "heading": {
+            "type": "integer",
+            "example": 159
+          },
+          "source": {
+            "type": "string",
+            "example": "Chart fox uplink",
+            "description": "[NULLABLE] String describing the source of the telemetry",
+            "enum": []
+          },
+          "next_update": {
+            "type": "string",
+            "example": "2023-08-08T10:00:01+00:00",
+            "description": "The time of the next expected telemetry update. This is computed dynamically, based on the information source",
+            "enum": []
+          }
+        }
+      },
+      "ErrorReportData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1,
+            "description": "required",
+            "enum": []
+          },
+          "status": {
+            "type": "integer",
+            "example": 1
+          },
+          "issue": {
+            "type": "integer",
+            "example": 1,
+            "description": "mixed",
+            "enum": []
+          },
+          "message": {
+            "type": "string",
+            "example": "Voluptatibus est non sequi enim. Dolore aliquid tenetur nesciunt perspiciatis hic eveniet. Itaque vel voluptatem est eius. Odio possimus et est accusamus et.",
+            "description": "mixed",
+            "enum": []
+          },
+          "chart": {
+            "type": "string",
+            "example": null,
+            "description": "mixed",
+            "enum": []
+          },
+          "staff_message": {
+            "type": "string",
+            "example": null,
+            "description": "mixed",
+            "enum": []
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2026-02-02T18:53:46+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2026-02-02T18:53:46+00:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "default": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "You can retrieve a token either: Via OAuth (if enabled for your organisation); or by generating a PAT in your organisation."
+      }
+    }
+  },
+  "security": [
+    {
+      "default": []
+    }
+  ],
+  "paths": {
+    "/v2/airports": {
+      "get": {
+        "summary": "List Airports",
+        "operationId": "listAirports",
+        "description": "Lists all airports matching any given search parameters. Returns a paginated response.\n\n **Requried Token Scopes**: \n - *airports:view* \n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "description": "The page number. Defaults to 1",
+            "example": 1,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "description": "The page number. Defaults to 1",
+              "example": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "description": "String to search by. The airport name and ICAO code will be matched with this parameter.",
+            "example": "Gatwick",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "String to search by. The airport name and ICAO code will be matched with this parameter.",
+              "example": "Gatwick"
+            }
+          },
+          {
+            "in": "query",
+            "name": "identQuery",
+            "description": "Search query for a full or partial airport ICAO/IATA code.",
+            "example": "EGK",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Search query for a full or partial airport ICAO/IATA code.",
+              "example": "EGK"
+            }
+          },
+          {
+            "in": "query",
+            "name": "nameQuery",
+            "description": "Search query for the airport name code.",
+            "example": "Gatwick",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Search query for the airport name code.",
+              "example": "Gatwick"
+            }
+          },
+          {
+            "in": "query",
+            "name": "isoCountry",
+            "description": "Search by the airport's country ISO Alpha 2 code (e.g. for the UK it would be \"GB\").",
+            "example": "GB",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Search by the airport's country ISO Alpha 2 code (e.g. for the UK it would be \"GB\").",
+              "example": "GB"
+            }
+          },
+          {
+            "in": "query",
+            "name": "supported",
+            "description": "Filter by whether to only show airports that are supported (either have a source or have charts).",
+            "example": false,
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Filter by whether to only show airports that are supported (either have a source or have charts).",
+              "example": false
+            }
+          },
+          {
+            "in": "query",
+            "name": "idents[]",
+            "description": "List of idents to filter by",
+            "example": [
+              "architecto"
+            ],
+            "required": false,
+            "schema": {
+              "type": "array",
+              "description": "List of idents to filter by",
+              "example": [
+                "architecto"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "ids[]",
+            "description": "List of ids to filter by",
+            "example": [
+              4326.41688
+            ],
+            "required": false,
+            "schema": {
+              "type": "array",
+              "description": "List of ids to filter by",
+              "example": [
+                4326.41688
+              ],
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 1,
+                        "ident": "ECOW",
+                        "icao_code": "ECOW",
+                        "iata_code": null,
+                        "name": "O'Kon Alley",
+                        "type": "medium_airport",
+                        "latitude": 46.965547,
+                        "longitude": 50.015088,
+                        "elevation_ft": 528,
+                        "iso_a2_country": "GB",
+                        "has_charts": false,
+                        "has_sources": false
+                      },
+                      {
+                        "id": 2,
+                        "ident": "ZNEW",
+                        "icao_code": "ZNEW",
+                        "iata_code": null,
+                        "name": "Zackary Throughway",
+                        "type": "medium_airport",
+                        "latitude": -82.810439,
+                        "longitude": 47.859695,
+                        "elevation_ft": 446,
+                        "iso_a2_country": "GB",
+                        "has_charts": false,
+                        "has_sources": false
+                      }
+                    ],
+                    "first_page_url": "/?page=1",
+                    "from": 1,
+                    "last_page": 1,
+                    "last_page_url": "/?page=1",
+                    "links": [
+                      {
+                        "url": null,
+                        "label": "&laquo; Previous",
+                        "page": null,
+                        "active": false
+                      },
+                      {
+                        "url": "/?page=1",
+                        "label": "1",
+                        "page": 1,
+                        "active": true
+                      },
+                      {
+                        "url": null,
+                        "label": "Next &raquo;",
+                        "page": null,
+                        "active": false
+                      }
+                    ],
+                    "next_page_url": null,
+                    "path": "/",
+                    "per_page": 10,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 2
+                  },
+                  "properties": {
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AirportData"
+                      }
+                    },
+                    "first_page_url": {
+                      "type": "string",
+                      "example": "/?page=1"
+                    },
+                    "from": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "last_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "last_page_url": {
+                      "type": "string",
+                      "example": "/?page=1"
+                    },
+                    "links": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "page": null,
+                          "active": false
+                        },
+                        {
+                          "url": "/?page=1",
+                          "label": "1",
+                          "page": 1,
+                          "active": true
+                        },
+                        {
+                          "url": null,
+                          "label": "Next &raquo;",
+                          "page": null,
+                          "active": false
+                        }
+                      ],
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": {
+                            "type": "string",
+                            "example": null
+                          },
+                          "label": {
+                            "type": "string",
+                            "example": "&laquo; Previous"
+                          },
+                          "page": {
+                            "type": "string",
+                            "example": null
+                          },
+                          "active": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    },
+                    "next_page_url": {
+                      "type": "string",
+                      "example": null
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/"
+                    },
+                    "per_page": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "prev_page_url": {
+                      "type": "string",
+                      "example": null
+                    },
+                    "to": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airports"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "",
+                    "example": null,
+                    "nullable": true
+                  },
+                  "identQuery": {
+                    "type": "string",
+                    "description": "Must contain only letters. Must not be greater than 4 characters.",
+                    "example": "bngz",
+                    "nullable": true
+                  },
+                  "nameQuery": {
+                    "type": "string",
+                    "description": "",
+                    "example": "architecto",
+                    "nullable": true
+                  },
+                  "isoCountry": {
+                    "type": "string",
+                    "description": "Must contain only letters. Must be 2 characters.",
+                    "example": "ng",
+                    "nullable": true
+                  },
+                  "supported": {
+                    "type": "boolean",
+                    "description": "",
+                    "example": true
+                  },
+                  "idents": {
+                    "type": "array",
+                    "description": "",
+                    "example": [
+                      "architecto"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "ids": {
+                    "type": "array",
+                    "description": "",
+                    "example": [
+                      4326.41688
+                    ],
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/airports/{airport_ident}": {
+      "get": {
+        "summary": "View Airport",
+        "operationId": "viewAirport",
+        "description": "Provides basic information about a single airport\n\n **Requried Token Scopes**: \n - *airports:view* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirportData"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airports"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "airport_ident",
+          "description": "Airport ICAO.",
+          "example": "EGLL",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/v2/airports/{airport_ident}/charts": {
+      "get": {
+        "summary": "List Airport Charts",
+        "operationId": "listAirportCharts",
+        "description": "Provides a list of charts available for the airport. The details for a chart can then be loaded with the /charts/ endpoint(s).\n\n **Requried Token Scopes**: \n - *charts:index* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": "dc505ffe-58a8-35d1-b100-fa0da3fc2c5c",
+                        "parent_id": null,
+                        "airport_icao": "RTYC",
+                        "name": "Ground Parking Chart",
+                        "code": "1-2",
+                        "type": 3,
+                        "type_key": "GroundLayout",
+                        "meta": [
+                          {
+                            "type": 0,
+                            "type_key": "Runways",
+                            "value": [
+                              "26L",
+                              "08R"
+                            ]
+                          }
+                        ],
+                        "view_url": "https://chartfox.org/RTYC#dc505ffe-58a8-35d1-b100-fa0da3fc2c5c",
+                        "has_georeferences": false
+                      },
+                      {
+                        "id": "bce454c4-1542-3f36-b546-8a269c829718",
+                        "parent_id": null,
+                        "airport_icao": "VXUW",
+                        "name": "Ground Parking Chart",
+                        "code": "1-2",
+                        "type": 3,
+                        "type_key": "GroundLayout",
+                        "meta": [
+                          {
+                            "type": 0,
+                            "type_key": "Runways",
+                            "value": [
+                              "26L",
+                              "08R"
+                            ]
+                          }
+                        ],
+                        "view_url": "https://chartfox.org/VXUW#bce454c4-1542-3f36-b546-8a269c829718",
+                        "has_georeferences": false
+                      }
+                    ],
+                    "first_page_url": "/?page=1",
+                    "from": 1,
+                    "last_page": 1,
+                    "last_page_url": "/?page=1",
+                    "links": [
+                      {
+                        "url": null,
+                        "label": "&laquo; Previous",
+                        "page": null,
+                        "active": false
+                      },
+                      {
+                        "url": "/?page=1",
+                        "label": "1",
+                        "page": 1,
+                        "active": true
+                      },
+                      {
+                        "url": null,
+                        "label": "Next &raquo;",
+                        "page": null,
+                        "active": false
+                      }
+                    ],
+                    "next_page_url": null,
+                    "path": "/",
+                    "per_page": 40,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 2
+                  },
+                  "properties": {
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ChartOverviewData"
+                      }
+                    },
+                    "first_page_url": {
+                      "type": "string",
+                      "example": "/?page=1"
+                    },
+                    "from": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "last_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "last_page_url": {
+                      "type": "string",
+                      "example": "/?page=1"
+                    },
+                    "links": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "page": null,
+                          "active": false
+                        },
+                        {
+                          "url": "/?page=1",
+                          "label": "1",
+                          "page": 1,
+                          "active": true
+                        },
+                        {
+                          "url": null,
+                          "label": "Next &raquo;",
+                          "page": null,
+                          "active": false
+                        }
+                      ],
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": {
+                            "type": "string",
+                            "example": null
+                          },
+                          "label": {
+                            "type": "string",
+                            "example": "&laquo; Previous"
+                          },
+                          "page": {
+                            "type": "string",
+                            "example": null
+                          },
+                          "active": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    },
+                    "next_page_url": {
+                      "type": "string",
+                      "example": null
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/"
+                    },
+                    "per_page": {
+                      "type": "integer",
+                      "example": 40
+                    },
+                    "prev_page_url": {
+                      "type": "string",
+                      "example": null
+                    },
+                    "to": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airports"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "airport_ident",
+          "description": "Airport ICAO.",
+          "example": "EGLL",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/v2/airports/{airport_ident}/charts/grouped": {
+      "get": {
+        "summary": "List Grouped Airport Charts",
+        "operationId": "listGroupedAirportCharts",
+        "description": "Provides a dictionary of charts, grouped by type, for the airport. The dictionary keys are Chart Type enums\n\n **Requried Token Scopes**: \n - *charts:index* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "data": {
+                      "0": [
+                        {
+                          "id": "55813afc-8119-4887-a0a3-f7f8ebb66609",
+                          "parent_id": null,
+                          "airport_icao": "EGLL",
+                          "name": "ATC SURVEILLANCE MINIMUM ALTITUDE CHART",
+                          "code": "5-1",
+                          "type": 0,
+                          "type_key": "Unknown",
+                          "meta": [
+                            {
+                              "type": 0,
+                              "type_key": "Runways",
+                              "value": [
+                                "27L",
+                                "27R"
+                              ]
+                            }
+                          ],
+                          "has_georeferences": false
+                        }
+                      ],
+                      "1": [
+                        {
+                          "id": "5878fa29-c972-46f1-8e75-2e5fe4093e24",
+                          "parent_id": null,
+                          "airport_icao": "EGLL",
+                          "name": "Bird Activity",
+                          "code": null,
+                          "type": 1,
+                          "type_key": "General",
+                          "meta": [
+                            {
+                              "type": 0,
+                              "type_key": "Runways",
+                              "value": [
+                                "27L",
+                                "27R"
+                              ]
+                            }
+                          ],
+                          "has_georeferences": false
+                        }
+                      ],
+                      "3": [
+                        {
+                          "id": "5878fa29-c972-46f1-8e75-2e5fe4093e25",
+                          "parent_id": null,
+                          "airport_icao": "EGLL",
+                          "name": "AERODROME CHART",
+                          "code": null,
+                          "type": 3,
+                          "type_key": "Ground",
+                          "meta": [
+                            {
+                              "type": 0,
+                              "type_key": "Runways",
+                              "value": [
+                                "27L",
+                                "27R"
+                              ]
+                            }
+                          ],
+                          "has_georeferences": true
+                        }
+                      ],
+                      "4": [
+                        {
+                          "id": "5878fa29-c972-46f1-8e75-2e5fe4093e26",
+                          "parent_id": null,
+                          "airport_icao": "EGLL",
+                          "name": "COMPTON 3F 3G 5J 4K",
+                          "code": null,
+                          "type": 4,
+                          "type_key": "SID",
+                          "meta": [
+                            {
+                              "type": 0,
+                              "type_key": "Runways",
+                              "value": [
+                                "27L",
+                                "27R"
+                              ]
+                            }
+                          ],
+                          "has_georeferences": false
+                        }
+                      ],
+                      "5": [
+                        {
+                          "id": "5878fa29-c972-46f1-8e75-2e5fe4093e34",
+                          "parent_id": null,
+                          "airport_icao": "EGLL",
+                          "name": "FITBO 1H",
+                          "code": null,
+                          "type": 5,
+                          "type_key": "STAR",
+                          "meta": [
+                            {
+                              "type": 0,
+                              "type_key": "Runways",
+                              "value": [
+                                "27L"
+                              ]
+                            }
+                          ],
+                          "has_georeferences": false
+                        }
+                      ],
+                      "6": [
+                        {
+                          "id": "5878fa29-c972-46f1-8e75-2e5fe4093d24",
+                          "parent_id": null,
+                          "airport_icao": "EGLL",
+                          "name": "RNP RWY 27L",
+                          "code": "8-9",
+                          "type": 6,
+                          "type_key": "Approach",
+                          "meta": [
+                            {
+                              "type": 0,
+                              "type_key": "Runways",
+                              "value": [
+                                "27L"
+                              ]
+                            },
+                            {
+                              "type": 2,
+                              "type_key": "ProcedureType",
+                              "value": [
+                                50
+                              ]
+                            }
+                          ],
+                          "has_georeferences": false
+                        }
+                      ]
+                    }
+                  },
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ChartOverviewData"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Airport not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": ""
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airports"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "airport_ident",
+          "description": "Airport ICAO.",
+          "example": "EGLL",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/v2/charts/{chart_id}": {
+      "get": {
+        "summary": "Get Chart",
+        "operationId": "getChart",
+        "description": "Provides detailed chart information, including how to access it\n\n **Requried Token Scopes**: \n - *charts:view* \n\n\n **Optional Token Scopes**: \n - *charts:files* If the token has this ability and the chart has them, first-party hosted mirrors of the chart will be included\n - *charts:geos* If the token has this ability and the chart has them, geo-referencing data will be included for the chart\n - *charts:view_source_url* If the token has this ability, the direct URL to view the chart is included\n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChartData"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Charts"
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "chart_id",
+          "description": "Chart UUID",
+          "example": "7fa053e7-6f65-48e2-b47e-a09b5e9da8e8",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/v2/interfaces/airport/{airport_ident}": {
+      "get": {
+        "summary": "Airport Chart Browser",
+        "operationId": "airportChartBrowser",
+        "description": "Provides a 'lite' verison of the ChartFox application, complete with chart filtering and displaying.\n\nBecause this is a client-side API method and it uses iframes, to authenticate with this method\n**you must** provide your API token in the query string (e.g. ?token={YOUR TOKEN HERE})\n\n **Requried Token Scopes**: \n - *interface:airportCharts* \n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "description": "Your API token",
+            "example": "{YOUR TOKEN HERE}",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Your API token",
+              "example": "{YOUR TOKEN HERE}"
+            }
+          },
+          {
+            "in": "query",
+            "name": "darkMode",
+            "description": "",
+            "example": true,
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "<HTML DOCUMENT>"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Interfaces"
+        ],
+        "security": []
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "airport_ident",
+          "description": "Airport ICAO Code",
+          "example": "EGLL",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/v2/user": {
+      "get": {
+        "summary": "User Details",
+        "operationId": "userDetails",
+        "description": "Retrieve details about the current authenticated user\n\n **Requried Token Scopes**: \n - *oauth:user:name* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataExternal"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "OAuth User Data"
+        ]
+      }
+    },
+    "/v2/user/telemetry": {
+      "get": {
+        "summary": "User Telemetry",
+        "operationId": "userTelemetry",
+        "description": "Access OAuth user's flight simulator telemetry, if any is available.\n\n **Requried Token Scopes**: \n - *oauth:telemetry:view* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryData"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "no telemetry available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "message": "No telemetry currently available for this user"
+                  },
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No telemetry currently available for this user"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "OAuth User Data"
+        ]
+      },
+      "put": {
+        "summary": "Update user's telemetry",
+        "operationId": "updateUsersTelemetry",
+        "description": "\n\n **Requried Token Scopes**: \n - *oauth:telemetry:update* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryData"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "OAuth User Data"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "latitude": {
+                    "type": "number",
+                    "description": "Must be at least -90. Must not be greater than 90.",
+                    "example": 1
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "Must be at least -180. Must not be greater than 180.",
+                    "example": 22
+                  },
+                  "heading": {
+                    "type": "number",
+                    "description": "Must be at least 0. Must not be greater than 360.",
+                    "example": 7
+                  },
+                  "speed": {
+                    "type": "number",
+                    "description": "Must be at least 0. Must not be greater than 1500.",
+                    "example": 16
+                  }
+                },
+                "required": [
+                  "latitude",
+                  "longitude",
+                  "heading",
+                  "speed"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/user/error-reports": {
+      "get": {
+        "summary": "List User Error Reports",
+        "operationId": "listUserErrorReports",
+        "description": "\n\n **Requried Token Scopes**: \n - *oauth:user:errorreports:view* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 1,
+                        "status": 1,
+                        "issue": 1,
+                        "message": "Voluptatibus est non sequi enim. Dolore aliquid tenetur nesciunt perspiciatis hic eveniet. Itaque vel voluptatem est eius. Odio possimus et est accusamus et.",
+                        "chart": null,
+                        "staff_message": null,
+                        "created_at": "2026-02-02T18:53:46+00:00",
+                        "updated_at": "2026-02-02T18:53:46+00:00"
+                      },
+                      {
+                        "id": 2,
+                        "status": 1,
+                        "issue": 0,
+                        "message": "Fugit doloribus at cumque voluptatum architecto fuga consequatur harum. Qui quia est est rerum animi quidem consequuntur aperiam. Hic molestiae fugiat deleniti aspernatur voluptas beatae molestias illo.",
+                        "chart": null,
+                        "staff_message": null,
+                        "created_at": "2026-02-02T18:53:46+00:00",
+                        "updated_at": "2026-02-02T18:53:46+00:00"
+                      }
+                    ],
+                    "first_page_url": "/?page=1",
+                    "from": 1,
+                    "last_page": 1,
+                    "last_page_url": "/?page=1",
+                    "links": [
+                      {
+                        "url": null,
+                        "label": "&laquo; Previous",
+                        "page": null,
+                        "active": false
+                      },
+                      {
+                        "url": "/?page=1",
+                        "label": "1",
+                        "page": 1,
+                        "active": true
+                      },
+                      {
+                        "url": null,
+                        "label": "Next &raquo;",
+                        "page": null,
+                        "active": false
+                      }
+                    ],
+                    "next_page_url": null,
+                    "path": "/",
+                    "per_page": 20,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 2
+                  },
+                  "properties": {
+                    "current_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ErrorReportData"
+                      }
+                    },
+                    "first_page_url": {
+                      "type": "string",
+                      "example": "/?page=1"
+                    },
+                    "from": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "last_page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "last_page_url": {
+                      "type": "string",
+                      "example": "/?page=1"
+                    },
+                    "links": {
+                      "type": "array",
+                      "example": [
+                        {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "page": null,
+                          "active": false
+                        },
+                        {
+                          "url": "/?page=1",
+                          "label": "1",
+                          "page": 1,
+                          "active": true
+                        },
+                        {
+                          "url": null,
+                          "label": "Next &raquo;",
+                          "page": null,
+                          "active": false
+                        }
+                      ],
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": {
+                            "type": "string",
+                            "example": null
+                          },
+                          "label": {
+                            "type": "string",
+                            "example": "&laquo; Previous"
+                          },
+                          "page": {
+                            "type": "string",
+                            "example": null
+                          },
+                          "active": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    },
+                    "next_page_url": {
+                      "type": "string",
+                      "example": null
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/"
+                    },
+                    "per_page": {
+                      "type": "integer",
+                      "example": 20
+                    },
+                    "prev_page_url": {
+                      "type": "string",
+                      "example": null
+                    },
+                    "to": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Error Reports"
+        ]
+      },
+      "post": {
+        "summary": "Create a new Error Report",
+        "operationId": "createANewErrorReport",
+        "description": "\n\n **Requried Token Scopes**: \n - *oauth:user:errorreports:create* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorReportData"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Error Reports"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "issue": {
+                    "type": "number",
+                    "description": "",
+                    "example": 4326.41688
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Must be at least 3 characters.",
+                    "example": "miyvdljnikhwaykcmyuwpwlvqwrsitcpscqldzsnrwtujwvlxjklqppwqbewtnnoqitpxntltc"
+                  },
+                  "debug_info": {
+                    "type": "object",
+                    "description": "",
+                    "example": null,
+                    "properties": {}
+                  },
+                  "chart_id": {
+                    "type": "string",
+                    "description": "The <code>id</code> of an existing record in the charts table.",
+                    "example": "architecto"
+                  }
+                },
+                "required": [
+                  "issue",
+                  "message",
+                  "chart_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/user/error-reports/{report_id}": {
+      "get": {
+        "summary": "Show User Error Reports",
+        "operationId": "showUserErrorReports",
+        "description": "\n\n **Requried Token Scopes**: \n - *oauth:user:errorreports:view* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorReportData"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Error Reports"
+        ]
+      },
+      "patch": {
+        "summary": "Update an exisiting Error Report",
+        "operationId": "updateAnExisitingErrorReport",
+        "description": "\n\n **Requried Token Scopes**: \n - *oauth:user:errorreports:view* \n",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorReportData"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Error Reports"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "",
+                    "example": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "report_id",
+          "description": "The ID of the report.",
+          "example": 16,
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ]
+    }
+  }
+}
