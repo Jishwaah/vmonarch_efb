@@ -201,7 +201,7 @@ class DispatcherController extends Controller
             ? "{$departureIcao}-{$arrivalIcao}"
             : null;
         $routeLabel = $routeIata ?: ($routeIcao ?: 'DEP-ARR');
-        $formattedMessage = "{$aircraftReg} {$callsignText} {$date} {$time} {$routeLabel}\n\n{$data['message']}";
+        $formattedMessage = "{$aircraftReg} {$callsignText} {$routeLabel} {$date} {$time}\n\n{$data['message']}";
 
         $dispatcherMessage = DispatcherMessage::create([
             'booking_id' => $data['booking_id'],

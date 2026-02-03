@@ -1,4 +1,4 @@
-ï»¿@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Dispatcher | vMonarch EFB')
 @section('header', 'Dispatcher')
