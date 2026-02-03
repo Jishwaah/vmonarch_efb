@@ -29,6 +29,28 @@ class VamsysService
         });
     }
 
+    public function getAircraft(int $aircraftId): ?array
+    {
+        $cacheKey = "vamsys.aircraft.{$aircraftId}";
+
+        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($aircraftId) {
+            $response = $this->get("/aircraft/{$aircraftId}");
+
+            return $response['data'] ?? null;
+        });
+    }
+
+    public function getAirport(int $airportId): ?array
+    {
+        $cacheKey = "vamsys.airport.{$airportId}";
+
+        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($airportId) {
+            $response = $this->get("/airports/{$airportId}");
+
+            return $response['data'] ?? null;
+        });
+    }
+
     public function findPilotByDiscordId(string $discordId): ?array
     {
         $response = $this->get('/pilots', [

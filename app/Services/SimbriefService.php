@@ -50,7 +50,19 @@ class SimbriefService
             ];
         }
 
-        $ofp = $payload['ofp'] ?? $payload;
+        $ofp = data_get($payload, 'ofp');
+        if (! is_array($ofp)) {
+            $ofp = data_get($payload, 'data.ofp');
+        }
+        if (! is_array($ofp)) {
+            $maybeData = data_get($payload, 'data');
+            if (is_array($maybeData)) {
+                $ofp = $maybeData;
+            }
+        }
+        if (! is_array($ofp)) {
+            $ofp = $payload;
+        }
 
         $data = $this->parseOfpData($ofp);
         $data['ofp_pdf_url'] = $this->extractPdfUrl($ofp) ?? $this->extractPdfUrl($payload);
@@ -64,6 +76,10 @@ class SimbriefService
 
     private function parseOfpData(array $ofp): array
     {
+        $alternateList = data_get($ofp, 'alternate');
+        $alternate1 = is_array($alternateList) ? ($alternateList[0] ?? null) : null;
+        $alternate2 = is_array($alternateList) ? ($alternateList[1] ?? null) : null;
+
         $data = [
             'origin_iata' => $this->firstNonEmpty([
                 data_get($ofp, 'origin.iata_code'),
@@ -81,19 +97,39 @@ class SimbriefService
                 data_get($ofp, 'destination.icao_code'),
                 data_get($ofp, 'destination.icao'),
             ]),
+            'alternate_iata' => $this->firstNonEmpty([
+                data_get($alternate1, 'iata_code'),
+                data_get($alternate1, 'iata'),
+                data_get($ofp, 'alternate.iata_code'),
+                data_get($ofp, 'alternate.iata'),
+            ]),
             'alternate_icao' => $this->firstNonEmpty([
+                data_get($alternate1, 'icao_code'),
+                data_get($alternate1, 'icao'),
                 data_get($ofp, 'alternate.icao_code'),
                 data_get($ofp, 'alternate.icao'),
             ]),
+            'alternate2_iata' => $this->firstNonEmpty([
+                data_get($alternate2, 'iata_code'),
+                data_get($alternate2, 'iata'),
+                data_get($ofp, 'alternate2.iata_code'),
+                data_get($ofp, 'alternate2.iata'),
+            ]),
             'alternate2_icao' => $this->firstNonEmpty([
+                data_get($alternate2, 'icao_code'),
+                data_get($alternate2, 'icao'),
                 data_get($ofp, 'alternate2.icao_code'),
                 data_get($ofp, 'alternate2.icao'),
             ]),
             'cruise_altitude' => $this->firstNonEmpty([
                 data_get($ofp, 'general.cruise_altitude'),
                 data_get($ofp, 'general.cruise_altitude_ft'),
+                data_get($ofp, 'general.initial_altitude'),
                 data_get($ofp, 'atc.flight_level'),
                 data_get($ofp, 'atc.initial_altitude'),
+                data_get($ofp, 'atc.initial_altitude_ft'),
+                data_get($ofp, 'atc.cruise_altitude'),
+                data_get($ofp, 'initial_altitude'),
                 data_get($ofp, 'plan_altitude'),
             ]),
             'ete' => $this->firstNonEmpty([
@@ -238,6 +274,10 @@ class SimbriefService
         foreach ($values as $value) {
             if (is_string($value) && trim($value) !== '') {
                 return $value;
+            }
+
+            if (is_int($value) || is_float($value)) {
+                return (string) $value;
             }
         }
 

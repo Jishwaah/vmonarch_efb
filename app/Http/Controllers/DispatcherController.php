@@ -39,6 +39,31 @@ class DispatcherController extends Controller
                 ? \App\Models\User::where('discord_id', $discordId)->first()
                 : null;
 
+            $departureId = $booking['departure_id'] ?? null;
+            $arrivalId = $booking['arrival_id'] ?? null;
+            $departureAirport = null;
+            $arrivalAirport = null;
+
+            if ($departureId) {
+                try {
+                    $departureAirport = $vamsysService->getAirport((int) $departureId);
+                } catch (\Throwable $exception) {
+                    $departureAirport = null;
+                }
+            }
+
+            if ($arrivalId) {
+                try {
+                    $arrivalAirport = $vamsysService->getAirport((int) $arrivalId);
+                } catch (\Throwable $exception) {
+                    $arrivalAirport = null;
+                }
+            }
+
+            $booking['departure_iata'] = $departureAirport['iata'] ?? null;
+            $booking['departure_icao'] = $departureAirport['icao'] ?? null;
+            $booking['arrival_iata'] = $arrivalAirport['iata'] ?? null;
+            $booking['arrival_icao'] = $arrivalAirport['icao'] ?? null;
             $booking['pilot'] = $pilot;
             $booking['discord_id'] = $discordId;
             $booking['local_user'] = $localUser;
@@ -97,22 +122,46 @@ class DispatcherController extends Controller
 
         $bookingUrl = $vamsysService->formatBookingUrl((int) $data['booking_id']);
         $callsign = null;
+        $aircraftReg = null;
+        $departureIata = null;
+        $arrivalIata = null;
 
         try {
             $bookingsPayload = $vamsysService->getActiveBookings();
             $booking = collect($bookingsPayload['data'] ?? [])
                 ->firstWhere('id', (int) $data['booking_id']);
             $callsign = $booking['callsign'] ?? null;
+            $aircraftId = $booking['aircraft_id'] ?? null;
+            if ($aircraftId) {
+                $aircraft = $vamsysService->getAircraft((int) $aircraftId);
+                $aircraftReg = $aircraft['registration'] ?? null;
+            }
+            $departureId = $booking['departure_id'] ?? null;
+            if ($departureId) {
+                $departureAirport = $vamsysService->getAirport((int) $departureId);
+                $departureIata = $departureAirport['iata'] ?? null;
+            }
+            $arrivalId = $booking['arrival_id'] ?? null;
+            if ($arrivalId) {
+                $arrivalAirport = $vamsysService->getAirport((int) $arrivalId);
+                $arrivalIata = $arrivalAirport['iata'] ?? null;
+            }
         } catch (\Throwable $exception) {
             $callsign = null;
+            $aircraftReg = null;
+            $departureIata = null;
+            $arrivalIata = null;
         }
 
         $now = now('UTC');
         $date = strtoupper($now->format('dMy'));
         $time = $now->format('Hi').'Z';
-        $aircraftReg = 'G-ZBXX';
+        $aircraftReg = $aircraftReg ?: 'G-ZBXX';
         $callsignText = $callsign ?: 'CALLSIGN';
-        $formattedMessage = "{$aircraftReg} {$callsignText} {$date} {$time}\n\n{$data['message']}";
+        $routeIata = ($departureIata && $arrivalIata)
+            ? "{$departureIata}-{$arrivalIata}"
+            : 'DEP-ARR';
+        $formattedMessage = "{$aircraftReg} {$callsignText} {$date} {$time} {$routeIata}\n\n{$data['message']}";
 
         $dispatcherMessage = DispatcherMessage::create([
             'booking_id' => $data['booking_id'],

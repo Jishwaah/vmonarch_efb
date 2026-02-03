@@ -67,7 +67,7 @@
                             </div>
                             <div class="pilot-block">
                                 <div class="label">Flight</div>
-                                <div class="value">{{ data_get($booking, 'departure_id') ?? 'â€”' }} â†’ {{ data_get($booking, 'arrival_id') ?? 'â€”' }}</div>
+                                <div class="value">{{ $booking['departure_iata'] ?? data_get($booking, 'departure_id') ?? "—" }} ? {{ $booking['arrival_iata'] ?? data_get($booking, 'arrival_id') ?? "—" }}</div>
                                 <div class="muted">Network: {{ data_get($booking, 'network') ?? 'Offline' }}</div>
                             </div>
                         </div>
@@ -141,3 +141,4 @@
         <p class="muted">Use the history view to see all messages within the last 48 hours.</p>
     </div>
 @endsection
+

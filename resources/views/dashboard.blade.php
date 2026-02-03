@@ -28,20 +28,24 @@
                 <div class="flight-block">
                     <div class="label">Cruise Altitude</div>
                     <div class="value">{{ $flight['cruise_altitude'] ?? '—' }}</div>
-                </div>
-                <div class="flight-block">
+                </div>                <div class="flight-block">
                     <div class="label">Alternate Airport</div>
                     <div class="value">
-                        @if (!empty($flight['alternate_icao']))
-                            {{ $flight['alternate_icao'] }}
+                        @if (!empty($flight['alternate_iata']) || !empty($flight['alternate_icao']))
+                            {{ $flight['alternate_iata'] ?? '—' }}
+                            <span class="icao">{{ $flight['alternate_icao'] ?? '—' }}</span>
                         @elseif (!empty($flight['alternates']))
                             {{ $flight['alternates'][0] }}
                         @else
                             —
                         @endif
                     </div>
-                    @if (!empty($flight['alternate2_icao']))
-                        <div class="muted">Secondary: {{ $flight['alternate2_icao'] }}</div>
+                    @if (!empty($flight['alternate2_iata']) || !empty($flight['alternate2_icao']))
+                        <div class="muted">
+                            Secondary:
+                            {{ $flight['alternate2_iata'] ?? '—' }}
+                            <span class="icao">{{ $flight['alternate2_icao'] ?? '—' }}</span>
+                        </div>
                     @endif
                 </div>
                 <div class="flight-block">
@@ -82,3 +86,4 @@
         </div>
     </div>
 @endsection
+
