@@ -93,7 +93,7 @@
     <div class="modal-overlay" data-modal="crew-modal" aria-hidden="true">
         <div class="modal">
             <div class="modal-header">
-                <h2>Flight Crew</h2>
+                <h2>Crew Roster</h2>
                 <button class="btn btn-secondary" type="button" data-modal-close="crew-modal">Close</button>
             </div>
             <div class="modal-body">
@@ -106,17 +106,16 @@
                 @else
                     <div class="crew-list">
                         <div class="crew-item">
-                            <div class="label">Pilot in Command</div>
+                            <div class="label">Flight Deck Crew</div>
                             <div class="value">
                                 {{ strtoupper(data_get($crew, 'cpt') ?? 'Unknown') }}
                                 @if ($pilotId)
                                     <span class="muted">({{ $pilotId }})</span>
                                 @endif
+                                @if (data_get($crew, 'fo'))
+                                    <span class="muted"> · {{ data_get($crew, 'fo') }}, First Officer</span>
+                                @endif
                             </div>
-                        </div>
-                        <div class="crew-item">
-                            <div class="label">First Officer</div>
-                            <div class="value">{{ data_get($crew, 'fo') ?? 'Unknown' }}</div>
                         </div>
                         <div class="crew-item">
                             <div class="label">Dispatcher</div>
@@ -147,5 +146,4 @@
         </div>
     </div>
 @endsection
-
 
