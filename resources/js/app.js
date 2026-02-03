@@ -18,3 +18,17 @@ if (document.querySelector('[data-utc-clock]')) {
     updateUtcClock();
     setInterval(updateUtcClock, 1000);
 }
+
+document.querySelectorAll('[data-sidebar-group]').forEach((group) => {
+    const toggle = group.querySelector('[data-sidebar-toggle]');
+    if (!toggle) {
+        return;
+    }
+
+    toggle.setAttribute('aria-expanded', group.classList.contains('open') ? 'true' : 'false');
+
+    toggle.addEventListener('click', () => {
+        const isOpen = group.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+});

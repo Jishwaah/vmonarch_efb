@@ -70,4 +70,8 @@ return [
         'base_url' => env('AVIATION_WEATHER_BASE_URL', 'https://aviationweather.gov/api/data'),
     ],
 
+    'autorouter' => [
+        'base_url' => env('AUTOROUTER_NOTAM_BASE_URL', 'https://api.autorouter.aero/v1.0'),
+    ],
+
 ];

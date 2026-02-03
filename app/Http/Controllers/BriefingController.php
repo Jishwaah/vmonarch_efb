@@ -61,9 +61,10 @@ class BriefingController extends Controller
         ));
 
         $icao = preg_match('/^[A-Z]{4}$/', $icao) ? $icao : '';
-        $notams = $icao && is_array($raw)
-            ? $simbriefService->getAerodromeNotams($raw, $icao)
-            : [];
+        $notams = $icao ? $this->fetchAutorouterNotams($icao) : [];
+        if (empty($notams) && $icao && is_array($raw)) {
+            $notams = $simbriefService->getAerodromeNotams($raw, $icao);
+        }
 
         return view('briefings.briefing', [
             'type' => $type,
@@ -71,5 +72,82 @@ class BriefingController extends Controller
             'notams' => $notams,
             'simbrief' => $result,
         ]);
+    }
+
+    private function fetchAutorouterNotams(string $icao): array
+    {
+        $baseUrl = rtrim((string) config('services.autorouter.base_url', 'https://api.autorouter.aero/v1.0'), '/');
+
+        $response = \Illuminate\Support\Facades\Http::timeout(10)
+            ->acceptJson()
+            ->get($baseUrl.'/notam', [
+                'itemas' => json_encode([$icao]),
+                'offset' => 0,
+                'limit' => 10,
+            ]);
+
+        if (! $response->ok()) {
+            return [];
+        }
+
+        $payload = $response->json();
+        if (! is_array($payload)) {
+            return [];
+        }
+
+        return $this->extractAutorouterNotams($payload);
+    }
+
+    private function extractAutorouterNotams(array $payload): array
+    {
+        $candidates = [];
+
+        foreach (['notams', 'data', 'items', 'results'] as $key) {
+            if (isset($payload[$key])) {
+                $candidates[] = $payload[$key];
+            }
+        }
+
+        $candidates[] = $payload;
+
+        $notams = [];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate)) {
+                $parts = preg_split('/\r\n\r\n|\n\n|\r\n|\n/', $candidate);
+                foreach ($parts as $part) {
+                    $text = trim($part);
+                    if ($text !== '') {
+                        $notams[] = $text;
+                    }
+                }
+                continue;
+            }
+
+            if (is_array($candidate)) {
+                foreach ($candidate as $item) {
+                    if (is_string($item)) {
+                        $text = trim($item);
+                        if ($text !== '') {
+                            $notams[] = $text;
+                        }
+                        continue;
+                    }
+
+                    if (is_array($item)) {
+                        $text = $item['text']
+                            ?? $item['raw']
+                            ?? $item['message']
+                            ?? $item['notam']
+                            ?? null;
+                        if (is_string($text) && trim($text) !== '') {
+                            $notams[] = trim($text);
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_values(array_unique($notams));
     }
 }
