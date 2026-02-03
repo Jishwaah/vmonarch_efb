@@ -532,6 +532,35 @@ a {
     border: 1px solid #e2e8f0;
 }
 
+.dispatcher-card-messages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.message-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.message-item.compact {
+    padding: 10px;
+    background: #f1f5f9;
+}
+
+.dispatcher-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
 .dispatcher-form {
     display: flex;
     flex-direction: column;

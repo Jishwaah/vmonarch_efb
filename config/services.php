@@ -48,6 +48,7 @@ return [
         'redirect' => env('DISCORD_REDIRECT_URI'),
         'guild_id' => env('DISCORD_GUILD_ID'),
         'bot_token' => env('DISCORD_BOT_TOKEN'),
+        'webhook_secret' => env('DISCORD_WEBHOOK_SECRET'),
         'roles' => [
             'pilot' => env('DISCORD_ROLE_PILOT'),
             'staff' => array_filter(explode(',', (string) env('DISCORD_ROLE_STAFF'))),

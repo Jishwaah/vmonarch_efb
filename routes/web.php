@@ -9,6 +9,7 @@ use App\Http\Controllers\OfpController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WeatherController;
+use App\Http\Controllers\Webhooks\DiscordWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -41,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('discord.role:staff')->group(function () {
         Route::get('/dispatcher', [DispatcherController::class, 'index'])->name('dispatcher');
         Route::post('/dispatcher/messages', [DispatcherController::class, 'sendMessage'])->name('dispatcher.message');
+        Route::get('/dispatcher/history', [DispatcherController::class, 'history'])->name('dispatcher.history');
     });
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
@@ -48,3 +50,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/discord/disconnect', [SettingsController::class, 'disconnectDiscord'])->name('settings.discord.disconnect');
     Route::delete('/settings', [SettingsController::class, 'destroy'])->name('settings.destroy');
 });
+
+Route::post('/webhooks/discord-dm', [DiscordWebhookController::class, 'receiveDm'])
+    ->name('webhooks.discord.dm');

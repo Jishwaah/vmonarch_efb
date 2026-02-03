@@ -17,6 +17,9 @@
         @else
             <div class="dispatcher-cards">
                 @foreach ($bookings as $booking)
+                    @php
+                        $bookingMessages = $messagesByBooking->get($booking['id'], ['inbound' => collect(), 'outbound' => collect()]);
+                    @endphp
                     <div class="dispatcher-card">
                         <div class="dispatcher-card-header">
                             <div>
@@ -83,6 +86,47 @@
                                 <div class="muted">Pilot must log in to EFB and enable Discord DMs before messaging.</div>
                             @endif
                         </div>
+
+                        <div class="dispatcher-card-messages">
+                            <div class="message-column">
+                                <div class="label">Inbound (last 5)</div>
+                                @forelse ($bookingMessages['inbound'] as $message)
+                                    <div class="message-item compact">
+                                        <div class="message-meta">
+                                            <span class="badge neutral">INBOUND</span>
+                                            <span class="muted">{{ $message->created_at->format('Y-m-d H:i') }} UTC</span>
+                                        </div>
+                                        <div class="muted">
+                                            {{ $message->sender_label ?? 'Pilot' }}
+                                            @if ($message->pilot_callsign)
+                                                · {{ $message->pilot_callsign }}
+                                            @endif
+                                            @if ($message->discord_username)
+                                                · {{ $message->discord_username }}
+                                            @endif
+                                        </div>
+                                        <div class="message-body">{{ $message->message }}</div>
+                                    </div>
+                                @empty
+                                    <div class="muted">No inbound messages.</div>
+                                @endforelse
+                            </div>
+                            <div class="message-column">
+                                <div class="label">Outbound (last 5)</div>
+                                @forelse ($bookingMessages['outbound'] as $message)
+                                    <div class="message-item compact">
+                                        <div class="message-meta">
+                                            <span class="badge success">OUTBOUND</span>
+                                            <span class="muted">{{ $message->created_at->format('Y-m-d H:i') }} UTC</span>
+                                        </div>
+                                        <div class="muted">MONOPS</div>
+                                        <div class="message-body">{{ $message->message }}</div>
+                                    </div>
+                                @empty
+                                    <div class="muted">No outbound messages.</div>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -90,28 +134,10 @@
     </div>
 
     <div class="card">
-        <h2>Recent Dispatcher Messages</h2>
-        @if ($messages->isEmpty())
-            <div class="empty-state">No messages sent yet.</div>
-        @else
-            <div class="message-list">
-                @foreach ($messages as $message)
-                    <div class="message-item">
-                        <div class="message-meta">
-                            <span class="badge {{ $message->status === 'sent' ? 'success' : ($message->status === 'failed' ? 'danger' : 'warning') }}">
-                                {{ strtoupper($message->status) }}
-                            </span>
-                            <span class="muted">Booking #{{ $message->booking_id }}</span>
-                            <span class="muted">Pilot {{ $message->pilot_id }}</span>
-                            <span class="muted">{{ $message->created_at->format('Y-m-d H:i') }} UTC</span>
-                        </div>
-                        <div class="message-body">{{ $message->message }}</div>
-                        @if ($message->error_message)
-                            <div class="muted">Error: {{ $message->error_message }}</div>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        @endif
+        <div class="dispatcher-history-header">
+            <h2>Dispatcher History</h2>
+            <a class="btn btn-secondary" href="{{ route('dispatcher.history') }}">View last 48 hours</a>
+        </div>
+        <p class="muted">Use the history view to see all messages within the last 48 hours.</p>
     </div>
 @endsection

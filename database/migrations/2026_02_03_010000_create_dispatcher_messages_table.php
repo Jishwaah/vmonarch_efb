@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('booking_id');
             $table->unsignedBigInteger('pilot_id');
             $table->string('discord_user_id');
-            $table->unsignedBigInteger('sent_by');
+            $table->unsignedBigInteger('sent_by')->nullable();
             $table->string('status')->default('pending');
             $table->string('booking_url')->nullable();
             $table->text('message');

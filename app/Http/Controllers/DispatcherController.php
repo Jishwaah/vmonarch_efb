@@ -48,12 +48,41 @@ class DispatcherController extends Controller
             return $booking;
         })->all();
 
-        $messages = DispatcherMessage::latest()->limit(20)->get();
+        $bookingIds = collect($enriched)->pluck('id')->filter()->unique()->values();
+        $messages = DispatcherMessage::query()
+            ->whereIn('booking_id', $bookingIds)
+            ->latest()
+            ->get();
+
+        $messagesByBooking = $messages->groupBy('booking_id')->map(function ($collection) {
+            $inbound = $collection->where('direction', 'inbound')->take(5)->values();
+            $outbound = $collection->where('direction', 'outbound')->take(5)->values();
+
+            return [
+                'inbound' => $inbound,
+                'outbound' => $outbound,
+            ];
+        });
 
         return view('dispatcher', [
             'bookings' => $enriched,
             'error' => $error,
+            'messagesByBooking' => $messagesByBooking,
+        ]);
+    }
+
+    public function history(): View
+    {
+        $since = now()->subHours(48);
+
+        $messages = DispatcherMessage::query()
+            ->where('created_at', '>=', $since)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('dispatcher-history', [
             'messages' => $messages,
+            'since' => $since,
         ]);
     }
 
@@ -76,6 +105,8 @@ class DispatcherController extends Controller
             'sent_by' => $request->user()->id,
             'status' => 'pending',
             'booking_url' => $bookingUrl,
+            'direction' => 'outbound',
+            'sender_label' => 'MONOPS',
         ]);
 
         try {
