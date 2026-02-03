@@ -9,13 +9,22 @@ use RuntimeException;
 
 class VamsysService
 {
-    public function getActiveBookings(int $perPage = 50): array
+    public function getActiveBookings(int $perPage = 50, bool $forceRefresh = false): array
     {
-        return $this->get('/bookings', [
-            'filter' => ['status' => 'current'],
-            'page' => ['size' => $perPage],
-            'sort' => '-id',
-        ]);
+        $cacheKey = "vamsys.bookings.current.{$perPage}";
+        if ($forceRefresh) {
+            Cache::forget($cacheKey);
+        }
+
+        $ttl = (int) config('services.vamsys.cache_minutes', 2);
+
+        return Cache::remember($cacheKey, now()->addMinutes($ttl), function () use ($perPage) {
+            return $this->get('/bookings', [
+                'filter' => ['status' => 'current'],
+                'page' => ['size' => $perPage],
+                'sort' => '-id',
+            ]);
+        });
     }
 
     public function getPilot(int $pilotId): ?array
@@ -113,5 +122,14 @@ class VamsysService
 
             return $token;
         });
+    }
+
+    public function clearCache(?int $perPage = null): void
+    {
+        if ($perPage) {
+            Cache::forget("vamsys.bookings.current.{$perPage}");
+        } else {
+            Cache::forget("vamsys.bookings.current.50");
+        }
     }
 }

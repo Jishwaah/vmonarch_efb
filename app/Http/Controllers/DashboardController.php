@@ -37,9 +37,10 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function refreshSimbrief(SimbriefService $simbriefService): RedirectResponse
+    public function refreshSimbrief(SimbriefService $simbriefService, VamsysService $vamsysService): RedirectResponse
     {
         $simbriefService->fetchLatestForUser(auth()->user(), true);
+        $vamsysService->clearCache();
 
         return redirect()->route('dashboard')->with('status', 'SimBrief data refreshed.');
     }

@@ -65,6 +65,7 @@ return [
         'base_url' => env('VAMSYS_BASE_URL', 'https://vamsys.io/api/v3/operations'),
         'token_url' => env('VAMSYS_TOKEN_URL', 'https://vamsys.io/oauth/token'),
         'web_booking_url' => env('VAMSYS_WEB_BOOKING_URL', 'https://vamsys.io/phoenix/flight-center/booking/{id}'),
+        'cache_minutes' => (int) env('VAMSYS_CACHE_MINUTES', 2),
     ],
 
     'weather' => [
