@@ -77,6 +77,9 @@ return [
     'chartfox' => [
         'base_url' => env('CHARTFOX_BASE_URL', 'https://api.chartfox.org'),
         'token' => env('CHARTFOX_API_TOKEN'),
+        'token_url' => env('CHARTFOX_TOKEN_URL', 'https://api.chartfox.org/oauth/token'),
+        'client_id' => env('CHARTFOX_CLIENT_ID'),
+        'client_secret' => env('CHARTFOX_CLIENT_SECRET'),
     ],
 
 ];
