@@ -349,6 +349,63 @@ a {
     flex-wrap: wrap;
 }
 
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    width: min(640px, 95vw);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.crew-list {
+    display: grid;
+    gap: 12px;
+}
+
+.crew-item .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+}
+
+.crew-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .ofp-actions {
     margin: 12px 0 16px;
 }

@@ -32,3 +32,38 @@ document.querySelectorAll('[data-sidebar-group]').forEach((group) => {
         toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 });
+
+document.querySelectorAll('[data-modal-open]').forEach((button) => {
+    const modalId = button.getAttribute('data-modal-open');
+    const overlay = document.querySelector(`[data-modal="${modalId}"]`);
+    if (!overlay) {
+        return;
+    }
+
+    button.addEventListener('click', () => {
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+    });
+});
+
+document.querySelectorAll('[data-modal-close]').forEach((button) => {
+    const modalId = button.getAttribute('data-modal-close');
+    const overlay = document.querySelector(`[data-modal="${modalId}"]`);
+    if (!overlay) {
+        return;
+    }
+
+    button.addEventListener('click', () => {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+    });
+});
+
+document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+    });
+});

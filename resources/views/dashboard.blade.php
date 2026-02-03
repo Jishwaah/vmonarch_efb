@@ -79,7 +79,6 @@
             </p>
         </div>
     @endif
-
     <div class="card">
         <h2>Quick Links</h2>
         <div class="quick-links">
@@ -87,8 +86,67 @@
             <a class="btn btn-secondary" href="{{ route('performance') }}">Performance</a>
             <a class="btn btn-secondary" href="{{ route('weather') }}">Weather</a>
             <a class="btn btn-secondary" href="{{ route('acars') }}">ACARS</a>
+            <button class="btn btn-secondary" type="button" data-modal-open="crew-modal">Flight Crew</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" data-modal="crew-modal" aria-hidden="true">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Flight Crew</h2>
+                <button class="btn btn-secondary" type="button" data-modal-close="crew-modal">Close</button>
+            </div>
+            <div class="modal-body">
+                @php
+                    $crew = $flight['crew'] ?? [];
+                    $pilotId = data_get($crew, 'pilot_id');
+                @endphp
+                @if (empty($crew))
+                    <div class="empty-state">No crew information available.</div>
+                @else
+                    <div class="crew-list">
+                        <div class="crew-item">
+                            <div class="label">Pilot in Command</div>
+                            <div class="value">
+                                {{ data_get($crew, 'cpt') ?? 'Unknown' }}
+                                @if ($pilotId)
+                                    <span class="muted">({{ $pilotId }})</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="crew-item">
+                            <div class="label">First Officer</div>
+                            <div class="value">{{ data_get($crew, 'fo') ?? 'Unknown' }}</div>
+                        </div>
+                        <div class="crew-item">
+                            <div class="label">Dispatcher</div>
+                            <div class="value">{{ data_get($crew, 'dx') ?? 'Unknown' }}</div>
+                        </div>
+                        <div class="crew-item">
+                            <div class="label">Cabin Manager</div>
+                            <div class="value">{{ data_get($crew, 'pu') ?? 'Unknown' }}</div>
+                        </div>
+                        <div class="crew-item">
+                            <div class="label">Cabin Crew</div>
+                            <div class="value">
+                                @php $fa = data_get($crew, 'fa', []); @endphp
+                                @if (! empty($fa))
+                                    <div class="crew-tags">
+                                        @foreach ($fa as $name)
+                                            <span class="badge neutral">{{ $name }}</span>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    —
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 @endsection
+
 
 

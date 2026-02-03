@@ -207,6 +207,7 @@ class SimbriefService
                 data_get($ofp, 'times.sched_in'),
                 data_get($ofp, 'times.eta'),
             ]),
+            'crew' => $this->parseCrew(data_get($ofp, 'crew', [])),
         ];
 
         $text = $this->extractOfpText($ofp);
@@ -221,6 +222,22 @@ class SimbriefService
         ]));
 
         return $data;
+    }
+
+    private function parseCrew($crew): array
+    {
+        if (! is_array($crew)) {
+            return [];
+        }
+
+        return [
+            'pilot_id' => data_get($crew, 'pilot_id'),
+            'cpt' => data_get($crew, 'cpt'),
+            'fo' => data_get($crew, 'fo'),
+            'dx' => data_get($crew, 'dx'),
+            'pu' => data_get($crew, 'pu'),
+            'fa' => array_values(array_filter((array) data_get($crew, 'fa', []))),
+        ];
     }
 
     public function getAerodromeNotams(array $ofp, ?string $icao): array
