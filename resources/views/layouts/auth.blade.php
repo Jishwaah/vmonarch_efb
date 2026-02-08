@@ -10,14 +10,6 @@
     <body class="auth-body">
         <div class="auth-shell">
             <div class="auth-card">
-                <div class="auth-brand">
-                    <div class="brand-title">vMonarch EFB</div>
-                    <div class="brand-subtitle">Pilot portal</div>
-                </div>
-                <div class="utc-clock compact" data-utc-clock>
-                    <span class="utc-label">UTC</span>
-                    <span class="utc-time" data-utc-time>--:--:--</span>
-                </div>
                 @include('partials.flash')
                 @yield('content')
             </div>

@@ -4,8 +4,11 @@
 
 @section('content')
     <div style="text-align: center;">
-        <img src="{{ asset('build/01K6G98FCG06KVEHTJQEND5EKH.png') }}" alt="vMonarch EFB" style="width: 100%; height: auto; display: block; margin: 0 auto 16px;" />
-        <h1>Sign in</h1>
+        <img src="{{ asset('images/01K6G98FCG06KVEHTJQEND5EKH.png') }}" alt="vMonarch EFB" style="width: 100%; height: auto; display: block; margin: 0 auto 16px;" />
+        <div class="auth-brand" style="text-align: center;">
+            <div class="brand-title">vMonarch EFB</div>
+        </div>
+        <h1><strong>Sign in</strong></h1>
         <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; margin: 24px 0;">
             @if ($discordOauthEnabled)
                 <a class="btn btn-discord" href="{{ route('auth.discord.redirect') }}">Continue with Discord </a>
